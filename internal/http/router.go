@@ -6,6 +6,7 @@ import (
 	"github.com/DevPulseLab/salat/internal/config"
 	"github.com/DevPulseLab/salat/internal/db/models"
 	"github.com/DevPulseLab/salat/internal/handlers"
+	"github.com/DevPulseLab/salat/internal/http/middleware"
 	"github.com/DevPulseLab/salat/internal/middlewares"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -16,6 +17,8 @@ func InitializeRoutes(router *gin.Engine, db *gorm.DB, config *config.Config) {
 	roleMiddleware := middlewares.NewRoleMiddleware()
 	authHandler := handlers.NewAuthHandler(db, config)
 	userHandler := handlers.NewUserHandler(db)
+
+	router.Use(middleware.CORSMiddleware())
 
 	router.GET("/api/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, map[string]string{"ping": "pong"})
