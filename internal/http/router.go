@@ -17,6 +17,8 @@ func InitializeRoutes(router *gin.Engine, db *gorm.DB, config *config.Config) {
 	authHandler := handlers.NewAuthHandler(db, config)
 	userHandler := handlers.NewUserHandler(db)
 
+	router.Use(middlewares.CORSMiddleware())
+
 	router.GET("/api/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, map[string]string{"ping": "pong"})
 	})
