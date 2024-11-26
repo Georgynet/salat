@@ -1,0 +1,22 @@
+meta {
+  name: Add Calendar
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:8080/api/user/calendar/add
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{jwtToken}}
+}
+
+body:json {
+  {
+    "startDate": "2024-11-25T00:00:00Z",
+    "endDate": "2024-11-29T00:00:00Z"
+  }
+}
