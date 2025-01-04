@@ -5,6 +5,11 @@ import Aura from '@primevue/themes/aura'
 import '@/style.css'
 import 'primeicons/primeicons.css'
 
+import moment from 'moment'
+import 'moment/dist/locale/de.js'
+
+moment.locale('de')
+
 import App from '@/App.vue'
 import { router } from '@/routes.js'
 

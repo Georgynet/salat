@@ -14,6 +14,7 @@ const events = ref([])
 const calendarContainer = useTemplateRef('calendarContainer')
 
 const addEvent = (calendarApi, startDate, endDate, status) => {
+  console.log(startDate, endDate)
   calendarApi.addEvent({
     title: "Salat",
     start: startDate,
@@ -60,7 +61,7 @@ onMounted(async () => {
 
   const userEvents = await calendarService.getEvents()
   userEvents.forEach(entry => {
-    addEvent(calendar, entry.date, entry.date, entry.status)
+    addEvent(calendar, entry.startDate, entry.endDate, entry.status)
   })
 })
 </script>
@@ -71,8 +72,6 @@ onMounted(async () => {
       <strong>{{ arg.event.title }}</strong>
     </template>
   </FullCalendar>
-
-  {{ events }}
 </template>
 
 <style>
