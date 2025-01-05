@@ -2,23 +2,22 @@
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import de from '@fullcalendar/core/locales/de'
+import fullcalendarDe from '@fullcalendar/core/locales/de'
 
-import {onMounted, ref, useTemplateRef} from 'vue'
+import {onMounted, useTemplateRef} from 'vue'
 
 import useCalendarService from '@/services/calendarService.js'
+import moment from "moment";
 
 const calendarService = useCalendarService()
-
-const events = ref([])
 const calendarContainer = useTemplateRef('calendarContainer')
 
 const addEvent = (calendarApi, startDate, endDate, status) => {
-  console.log(startDate, endDate)
   calendarApi.addEvent({
+    id: startDate.format('YYYY-MM-DD'),
     title: "Salat",
-    start: startDate,
-    end: endDate,
+    start: startDate.format('YYYY-MM-DD'),
+    end: endDate.format('YYYY-MM-DD'),
     classNames: ['event-' + status],
     allDay: true
   })
@@ -30,7 +29,8 @@ const calendarOptions = {
   selectable: true,
   hiddenDays: [0, 6],
   firstDay: 1,
-  locale: de,
+  locale: fullcalendarDe,
+  defaultAllDay: true,
   dayHeaderFormat: {
     weekday: 'long'
   },
@@ -46,13 +46,18 @@ const calendarOptions = {
     const calendarApi = selectInfo.view.calendar
     calendarApi.unselect()
 
-    const isEventAdded = await calendarService.addEvent(selectInfo.startStr, selectInfo.endStr)
-    if (isEventAdded) {
-      addEvent(calendarApi, selectInfo.startStr, selectInfo.endStr, 'approved')
+    const startDate = moment(selectInfo.startStr)
+    const endDate = moment(selectInfo.endStr)
+
+    if (calendarApi.getEventById(startDate.format('YYYY-MM-DD')) instanceof Object) {
+      alert('Hier hast Du dich bereits eingetragen!')
+      return
     }
-  },
-  eventsSet: (calendarEvents) => {
-    events.value = calendarEvents
+
+    const isEventAdded = await calendarService.addEvent(startDate, endDate)
+    if (isEventAdded) {
+      addEvent(calendarApi, startDate, endDate, 'reserved', true)
+    }
   }
 }
 
