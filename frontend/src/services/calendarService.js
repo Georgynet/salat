@@ -1,11 +1,12 @@
 import http from '@/http.js'
+import { inject } from 'vue'
 import moment from 'moment'
 
 const useCalendarService = () => {
-    const dateFormat = 'YYYY-MM-DD'
+    const appConfig = inject('config')
 
-    const getEvents = async () => {
-        const response = await http.get('/api/user/calendar/current-user-list')
+    const getEvents = async (startDate, endDate) => {
+        const response = await http.get('/api/user/calendar/current-user-list?start_date=' + startDate.format(appConfig.DATE_FORMAT) + '&end_date=' + endDate.format(appConfig.DATE_FORMAT))
         if (!response.data.calendarEntries) {
             return []
         }
@@ -18,12 +19,10 @@ const useCalendarService = () => {
     }
 
     const addEvent = async (startDate, endDate) => {
-        const response = await http.post('/api/user/calendar/add', {
-            startDate: startDate.format(dateFormat) + "T00:00:00Z",
-            endDate: endDate.format(dateFormat) + "T00:00:00Z"
+        return await http.post('/api/user/calendar/add', {
+            startDate: startDate.format(appConfig.DATETIME_FORMAT),
+            endDate: endDate.format(appConfig.DATETIME_FORMAT)
         })
-
-        return response.status === 200
     }
 
     return {

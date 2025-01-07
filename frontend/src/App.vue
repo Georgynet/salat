@@ -1,7 +1,13 @@
 <script setup>
+import { provide } from 'vue'
 import Menubar from 'primevue/menubar'
 import AppMessage from '@/components/AppMessage.vue'
 import { getRoutes } from '@/routes.js'
+
+provide('config', {
+  DATE_FORMAT: 'YYYY-MM-DD',
+  DATETIME_FORMAT: 'YYYY-MM-DD\\THH:mm:ss\\Z'
+})
 </script>
 
 <template>

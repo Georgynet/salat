@@ -4,20 +4,26 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import fullcalendarDe from '@fullcalendar/core/locales/de'
 
-import {onMounted, useTemplateRef} from 'vue'
+import {useTemplateRef, inject} from 'vue'
 
 import useCalendarService from '@/services/calendarService.js'
-import moment from "moment";
+import moment from 'moment'
+import useAppStore from '@/stores/appStore.js'
 
+const appConfig = inject('config')
+
+const appStore = useAppStore()
 const calendarService = useCalendarService()
 const calendarContainer = useTemplateRef('calendarContainer')
 
+const currentWeek = moment().isoWeek()
+
 const addEvent = (calendarApi, startDate, endDate, status) => {
   calendarApi.addEvent({
-    id: startDate.format('YYYY-MM-DD'),
+    id: startDate.format(appConfig.DATE_FORMAT),
     title: "Salat",
-    start: startDate.format('YYYY-MM-DD'),
-    end: endDate.format('YYYY-MM-DD'),
+    start: startDate.format(appConfig.DATE_FORMAT),
+    end: endDate.format(appConfig.DATE_FORMAT),
     classNames: ['event-' + status],
     allDay: true
   })
@@ -30,6 +36,7 @@ const calendarOptions = {
   hiddenDays: [0, 6],
   firstDay: 1,
   locale: fullcalendarDe,
+  weekNumbers: true,
   defaultAllDay: true,
   dayHeaderFormat: {
     weekday: 'long'
@@ -39,36 +46,54 @@ const calendarOptions = {
     center: 'title',
     right: 'today prev,next'
   },
-  eventClick: (info) => {
-    info.el.style.borderColor = 'red';
+  dayCellClassNames: function (info) {
+    const weekNumber = moment(info.date).isoWeek()
+    if (weekNumber > currentWeek) {
+      return ['allow-week']
+    }
+
+    return ['disallow-week']
+  },
+  datesSet: async (info) => {
+    const calenderApi = info.view.calendar
+
+    calenderApi.removeAllEvents()
+    const userEvents = await calendarService.getEvents(
+        moment(info.start),
+        moment(info.end)
+    )
+
+    userEvents.forEach(entry => {
+      addEvent(calenderApi, entry.startDate, entry.endDate, entry.status)
+    })
   },
   select: async (selectInfo) => {
     const calendarApi = selectInfo.view.calendar
+    const weekNumber = moment(selectInfo.start).isoWeek()
+
     calendarApi.unselect()
+
+    if (weekNumber < currentWeek) {
+      alert('Kannste nicht ...')
+      return
+    }
 
     const startDate = moment(selectInfo.startStr)
     const endDate = moment(selectInfo.endStr)
 
-    if (calendarApi.getEventById(startDate.format('YYYY-MM-DD')) instanceof Object) {
+    if (calendarApi.getEventById(startDate.format(appConfig.DATE_FORMAT)) instanceof Object) {
       alert('Hier hast Du dich bereits eingetragen!')
       return
     }
 
-    const isEventAdded = await calendarService.addEvent(startDate, endDate)
-    if (isEventAdded) {
-      addEvent(calendarApi, startDate, endDate, 'reserved', true)
+    const response = await calendarService.addEvent(startDate, endDate)
+    if (response.status === 200) {
+      addEvent(calendarApi, startDate, endDate, 'approved', true)
+    } else {
+      appStore.setAppMessage(400, response.data.message)
     }
   }
 }
-
-onMounted(async () => {
-  const calendar = calendarContainer.value.getApi()
-
-  const userEvents = await calendarService.getEvents()
-  userEvents.forEach(entry => {
-    addEvent(calendar, entry.startDate, entry.endDate, entry.status)
-  })
-})
 </script>
 
 <template>
@@ -80,6 +105,14 @@ onMounted(async () => {
 </template>
 
 <style>
+.disallow-week {
+  background-color: #f4e4a9;
+}
+
+.allow-week {
+  background-color: #d1ffbf;
+}
+
 .event-approved {
   background-color: #4faa2f;
 }
