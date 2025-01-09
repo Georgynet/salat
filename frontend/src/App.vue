@@ -4,6 +4,7 @@ import Menubar from 'primevue/menubar'
 import AppMessage from '@/components/AppMessage.vue'
 import { getRoutes } from '@/routes.js'
 import Toast from 'primevue/toast'
+import ConfirmDialog from 'primevue/confirmdialog'
 
 provide('config', {
   VIEW_DATE_FORMAT: 'DD.MM.YYYY',
@@ -29,6 +30,7 @@ provide('config', {
     </Menubar>
 
     <Toast />
+    <ConfirmDialog />
     <AppMessage />
 
     <RouterView />

@@ -6,6 +6,8 @@ import fullcalendarDe from '@fullcalendar/core/locales/de'
 
 import {inject} from 'vue'
 
+
+import { useConfirm } from 'primevue/useconfirm'
 import useCalendarService from '@/services/calendarService.js'
 import moment from 'moment'
 import useAppStore from '@/stores/appStore.js'
@@ -14,6 +16,7 @@ const appConfig = inject('config')
 
 const appStore = useAppStore()
 const calendarService = useCalendarService()
+const confirm = useConfirm()
 
 const today = moment()
 const currentWeek = today.isoWeek()
@@ -79,7 +82,12 @@ const calendarOptions = {
     calendarApi.unselect()
 
     if (weekNumber < currentWeek) {
-      alert('Kannste nicht ...')
+      confirm.require({
+        message: 'Entry is no longer possible this week',
+        header: 'Not possible',
+        acceptLabel: 'Ok',
+        rejectClass: '!hidden'
+      })
       return
     }
 
@@ -87,7 +95,12 @@ const calendarOptions = {
     const endDate = moment(selectInfo.endStr)
 
     if (calendarApi.getEventById(startDate.format(appConfig.DATE_FORMAT)) instanceof Object) {
-      alert('Hier hast Du dich bereits eingetragen!')
+      confirm.require({
+        message: 'You have already made an entry on this day.',
+        header: 'Duplicate entry',
+        acceptLabel: 'Ok',
+        rejectClass: '!hidden'
+      })
       return
     }
 

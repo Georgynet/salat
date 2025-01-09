@@ -6,6 +6,7 @@ import '@/style.css'
 import 'primeicons/primeicons.css'
 
 import ToastService from 'primevue/toastservice'
+import ConfirmationService from 'primevue/confirmationservice'
 
 import moment from 'moment'
 import 'moment/dist/locale/de.js'
@@ -25,4 +26,5 @@ createApp(App)
   })
   .use(router)
   .use(ToastService)
+  .use(ConfirmationService)
   .mount('#app')
