@@ -5,6 +5,7 @@ import AppMessage from '@/components/AppMessage.vue'
 import { getRoutes } from '@/routes.js'
 
 provide('config', {
+  VIEW_DATE_FORMAT: 'DD.MM.YYYY',
   DATE_FORMAT: 'YYYY-MM-DD',
   DATETIME_FORMAT: 'YYYY-MM-DD\\THH:mm:ss\\Z'
 })
