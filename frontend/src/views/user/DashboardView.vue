@@ -94,6 +94,7 @@ const calendarOptions = {
     const response = await calendarService.addEvent(startDate, endDate)
     if (response.status === 200) {
       addEvent(calendarApi, startDate, endDate, 'approved', true)
+      appStore.setAppMessage(200, response.data.message)
     } else {
       appStore.setAppMessage(400, response.data.message)
     }
