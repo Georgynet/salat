@@ -7,8 +7,10 @@ import 'primeicons/primeicons.css'
 
 import moment from 'moment'
 import 'moment/dist/locale/de.js'
+import { extendMoment } from 'moment-range';
 
 moment.locale('de')
+extendMoment(moment)
 
 import App from '@/App.vue'
 import { router } from '@/routes.js'

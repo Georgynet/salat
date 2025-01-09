@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import fullcalendarDe from '@fullcalendar/core/locales/de'
 
-import {useTemplateRef, inject} from 'vue'
+import {inject} from 'vue'
 
 import useCalendarService from '@/services/calendarService.js'
 import moment from 'moment'
