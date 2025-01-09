@@ -2,6 +2,8 @@
 import moment from 'moment'
 import useUsersService from '@/services/usersService.js'
 import {inject, onMounted, ref} from 'vue'
+import DaySelect from "@/components/DaySelect.vue";
+
 
 const usersService = useUsersService()
 
@@ -9,6 +11,7 @@ const entries = ref([])
 const users = ref([])
 
 const loading = ref(true)
+const dayChangedIndex = ref('')
 
 const startDate = moment().subtract(1, 'week').startOf('week')
 const endDate = moment().add(1, 'week').endOf('week')
@@ -35,7 +38,12 @@ const dayEntry = (day, userId) => {
     return entry.status
   }
 
-  return '---'
+  return 'noentry'
+}
+
+const changeUserDayStatus = (data) => {
+  dayChangedIndex.value = data.index
+  window.setTimeout(() => { dayChangedIndex.value = '' }, 1000)
 }
 
 </script>
@@ -58,8 +66,8 @@ const dayEntry = (day, userId) => {
     <tbody>
       <tr class="border-b" v-for="user in users" :key="user.id">
         <td class="px-4 py-2 w-[200px] border-l">{{ user.username }}</td>
-        <td class="px-4 py-2 w-[200px] border-l border-r text-center" v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')">
-          {{ dayEntry(day, user.id) }}
+        <td :class="{'bg-green-100': dayChangedIndex === day.format(appConfig.DATE_FORMAT) + '_' + user.id}" class="px-4 py-2 w-[200px] border-l border-r text-center" v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')">
+          <day-select :status="dayEntry(day, user.id)" :day="day" :user-id="user.id" @change="changeUserDayStatus" />
         </td>
       </tr>
     </tbody>
