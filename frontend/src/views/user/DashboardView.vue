@@ -14,9 +14,9 @@ const appConfig = inject('config')
 
 const appStore = useAppStore()
 const calendarService = useCalendarService()
-const calendarContainer = useTemplateRef('calendarContainer')
 
-const currentWeek = moment().isoWeek()
+const today = moment()
+const currentWeek = today.isoWeek()
 
 const addEvent = (calendarApi, startDate, endDate, status) => {
   calendarApi.addEvent({
@@ -48,11 +48,16 @@ const calendarOptions = {
   },
   dayCellClassNames: function (info) {
     const weekNumber = moment(info.date).isoWeek()
-    if (weekNumber > currentWeek) {
-      return ['allow-week']
+    if (weekNumber <= currentWeek) {
+      return ['disallow-week']
     }
 
-    return ['disallow-week']
+    const allowNextWeek = today.isoWeekday() < 5 && today.hour() > 12
+    if(!allowNextWeek && weekNumber === currentWeek + 1) {
+      return ['disallow-week']
+    }
+
+    return ['allow-week']
   },
   datesSet: async (info) => {
     const calenderApi = info.view.calendar
