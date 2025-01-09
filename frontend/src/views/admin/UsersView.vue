@@ -3,9 +3,10 @@ import moment from 'moment'
 import useUsersService from '@/services/usersService.js'
 import {inject, onMounted, ref} from 'vue'
 import DaySelect from "@/components/DaySelect.vue";
-
+import { useToast } from 'primevue/usetoast'
 
 const usersService = useUsersService()
+const toast = useToast()
 
 const entries = ref([])
 const users = ref([])
@@ -41,7 +42,8 @@ const dayEntry = (day, userId) => {
   return 'noentry'
 }
 
-const changeUserDayStatus = (data) => {
+const changeUserDayStatus = async (data) => {
+  toast.add({severity: 'success', summary: 'Status changed ...', life: 2000})
   dayChangedIndex.value = data.index
   window.setTimeout(() => { dayChangedIndex.value = '' }, 1000)
 }

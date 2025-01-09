@@ -5,6 +5,8 @@ import Aura from '@primevue/themes/aura'
 import '@/style.css'
 import 'primeicons/primeicons.css'
 
+import ToastService from 'primevue/toastservice'
+
 import moment from 'moment'
 import 'moment/dist/locale/de.js'
 import { extendMoment } from 'moment-range';
@@ -22,4 +24,5 @@ createApp(App)
     }
   })
   .use(router)
+  .use(ToastService)
   .mount('#app')
