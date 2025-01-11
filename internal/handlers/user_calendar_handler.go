@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"math"
 	"net/http"
 	"time"
@@ -9,6 +8,7 @@ import (
 	"github.com/DevPulseLab/salat/internal/db/repositories"
 	"github.com/DevPulseLab/salat/internal/dto"
 	"github.com/DevPulseLab/salat/internal/forms"
+	"github.com/DevPulseLab/salat/internal/helper"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -16,12 +16,14 @@ import (
 type UserCalendarHandler struct {
 	CalendarRepo *repositories.CalendarRepository
 	UserRepo     *repositories.UserRepository
+	DateHelper   *helper.DateHelper
 }
 
 func NewUserCalendarHandler(db *gorm.DB) *UserCalendarHandler {
-	calendarRepo := repositories.NewCalendarRepository(db)
+	dateHelper := helper.NewDateHelper()
+	calendarRepo := repositories.NewCalendarRepository(db, dateHelper)
 	userRepo := repositories.NewUserRepository(db)
-	return &UserCalendarHandler{calendarRepo, userRepo}
+	return &UserCalendarHandler{calendarRepo, userRepo, dateHelper}
 }
 
 func (handler *UserCalendarHandler) Add(ctx *gin.Context) {
@@ -94,7 +96,6 @@ func (handler *UserCalendarHandler) CurrentUserList(ctx *gin.Context) {
 	endDate, err := getEndDateFromRequest(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid end_date format. Use YYYY-MM-DD."})
-		fmt.Println(err)
 		return
 	}
 
@@ -112,6 +113,35 @@ func (handler *UserCalendarHandler) CurrentUserList(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"calendarEntries": calendarDtos})
+}
+
+func (handler *UserCalendarHandler) RemoveEntryForCurrentUser(ctx *gin.Context) {
+	var form forms.RemoveCalendarEntryForm
+	if err := ctx.ShouldBindJSON(&form); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	userId, err := handler.UserRepo.GetIdByUsername(ctx.GetString("username"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	calendarEntry, err := handler.CalendarRepo.GetByIdForUserId(form.CalendarEntryId, userId)
+	if calendarEntry.Date.Before(time.Now()) || handler.DateHelper.IsDateInCurrentWeek(calendarEntry.Date) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Can not remove past entries"})
+		return
+	}
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Calendar entry not found"})
+		return
+	}
+
+	handler.CalendarRepo.Remove(&calendarEntry)
+
+	ctx.JSON(http.StatusOK, gin.H{"success": true})
 }
 
 func getStartDateFromRequest(ctx *gin.Context) (time.Time, error) {
