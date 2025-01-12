@@ -7,7 +7,7 @@ import fullcalendarDe from '@fullcalendar/core/locales/de'
 import {inject} from 'vue'
 
 
-import { useConfirm } from 'primevue/useconfirm'
+import {useConfirm} from 'primevue/useconfirm'
 import useCalendarService from '@/services/calendarService.js'
 import moment from 'moment'
 import useAppStore from '@/stores/appStore.js'
@@ -56,7 +56,7 @@ const calendarOptions = {
     }
 
     const allowNextWeek = today.isoWeekday() < 5 && today.hour() > 12
-    if(!allowNextWeek && weekNumber === currentWeek + 1) {
+    if (!allowNextWeek && weekNumber === currentWeek + 1) {
       return ['disallow-week']
     }
 
@@ -78,12 +78,13 @@ const calendarOptions = {
   select: async (selectInfo) => {
     const calendarApi = selectInfo.view.calendar
     const weekNumber = moment(selectInfo.start).isoWeek()
+    const currentDayOfWeek = today.isoWeekday()
 
     calendarApi.unselect()
 
-    if (weekNumber < currentWeek) {
+    if (weekNumber < currentWeek || (weekNumber === currentWeek && currentDayOfWeek >= 5 && currentDayOfWeek <= 7)) {
       confirm.require({
-        message: 'Entry is no longer possible this week',
+        message: 'Entry is no longer possible this week.',
         header: 'Not possible',
         acceptLabel: 'Ok',
         rejectClass: '!hidden'
