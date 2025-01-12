@@ -6,6 +6,7 @@ import HomeView from '@/views/HomeView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 
 import DashboardView from '@/views/user/DashboardView.vue'
+import UsersView from '@/views/admin/UsersView.vue'
 
 import useUserService from '@/services/userService'
 import useUserStore from '@/stores/userStore'
@@ -39,6 +40,15 @@ const routes = [
         component: DashboardView,
         meta: {
             label: 'Dashboard',
+            requiresAuth: true
+        },
+    },
+    {
+        name: 'admin.users',
+        path: '/admin/users',
+        component: UsersView,
+        meta: {
+            label: 'Users',
             requiresAuth: true
         },
     },

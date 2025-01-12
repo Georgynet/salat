@@ -4,8 +4,10 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import fullcalendarDe from '@fullcalendar/core/locales/de'
 
-import {useTemplateRef, inject} from 'vue'
+import {inject} from 'vue'
 
+
+import { useConfirm } from 'primevue/useconfirm'
 import useCalendarService from '@/services/calendarService.js'
 import moment from 'moment'
 import useAppStore from '@/stores/appStore.js'
@@ -14,6 +16,7 @@ const appConfig = inject('config')
 
 const appStore = useAppStore()
 const calendarService = useCalendarService()
+const confirm = useConfirm()
 
 const today = moment()
 const currentWeek = today.isoWeek()
@@ -79,7 +82,12 @@ const calendarOptions = {
     calendarApi.unselect()
 
     if (weekNumber < currentWeek) {
-      alert('Kannste nicht ...')
+      confirm.require({
+        message: 'Entry is no longer possible this week',
+        header: 'Not possible',
+        acceptLabel: 'Ok',
+        rejectClass: '!hidden'
+      })
       return
     }
 
@@ -87,13 +95,18 @@ const calendarOptions = {
     const endDate = moment(selectInfo.endStr)
 
     if (calendarApi.getEventById(startDate.format(appConfig.DATE_FORMAT)) instanceof Object) {
-      alert('Hier hast Du dich bereits eingetragen!')
+      confirm.require({
+        message: 'You have already made an entry on this day.',
+        header: 'Duplicate entry',
+        acceptLabel: 'Ok',
+        rejectClass: '!hidden'
+      })
       return
     }
 
     const response = await calendarService.addEvent(startDate, endDate)
     if (response.status === 200) {
-      addEvent(calendarApi, startDate, endDate, 'approved', true)
+      addEvent(calendarApi, startDate, endDate, appConfig.calendar.status.approved, true)
       appStore.setAppMessage(200, response.data.message)
     } else {
       appStore.setAppMessage(400, response.data.message)

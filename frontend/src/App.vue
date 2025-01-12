@@ -3,10 +3,27 @@ import { provide } from 'vue'
 import Menubar from 'primevue/menubar'
 import AppMessage from '@/components/AppMessage.vue'
 import { getRoutes } from '@/routes.js'
+import Toast from 'primevue/toast'
+import ConfirmDialog from 'primevue/confirmdialog'
 
 provide('config', {
+  VIEW_DATE_FORMAT: 'DD.MM.YYYY',
   DATE_FORMAT: 'YYYY-MM-DD',
-  DATETIME_FORMAT: 'YYYY-MM-DD\\THH:mm:ss\\Z'
+  DATETIME_FORMAT: 'YYYY-MM-DD\\THH:mm:ss\\Z',
+  calendar: {
+    status: {
+      noentry: 'noentry',
+      rejected: 'rejected',
+      approved: 'approved',
+      reserved: 'reserved',
+    },
+    statusText: {
+      noentry: '---',
+      rejected: 'rejected',
+      approved: 'approved',
+      reserved: 'reserved',
+    }
+  }
 })
 </script>
 
@@ -26,6 +43,8 @@ provide('config', {
       </template>
     </Menubar>
 
+    <Toast />
+    <ConfirmDialog />
     <AppMessage />
 
     <RouterView />
