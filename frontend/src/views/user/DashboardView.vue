@@ -21,9 +21,9 @@ const confirm = useConfirm()
 const today = moment()
 const currentWeek = today.isoWeek()
 
-const addEvent = (calendarApi, startDate, endDate, status) => {
+const addEvent = (calendarApi, id, startDate, endDate, status) => {
   calendarApi.addEvent({
-    id: startDate.format(appConfig.DATE_FORMAT),
+    id: id,
     title: "Salat",
     start: startDate.format(appConfig.DATE_FORMAT),
     end: endDate.format(appConfig.DATE_FORMAT),
@@ -32,10 +32,26 @@ const addEvent = (calendarApi, startDate, endDate, status) => {
   })
 }
 
+const removeEvent = async (eventId) => {
+  const eventIdAsNumber = Number(eventId);
+  return await calendarService.removeEvent(eventIdAsNumber);
+}
+
 const calendarOptions = {
   plugins: [dayGridPlugin, interactionPlugin],
   initialView: 'dayGridMonth',
   selectable: true,
+  eventClick: async (info) => {
+    const eventId = info.event.id,
+        response = await removeEvent(eventId);
+
+    if (response.status === 200) {
+      info.event.remove();
+      appStore.setAppMessage(200, 'This entry is successfully deleted')
+    } else {
+      appStore.setAppMessage(400, 'You can not remove past or this week entries');
+    }
+  },
   hiddenDays: [0, 6],
   firstDay: 1,
   locale: fullcalendarDe,
@@ -75,7 +91,7 @@ const calendarOptions = {
     )
 
     userEvents.forEach(entry => {
-      addEvent(calenderApi, entry.startDate, entry.endDate, entry.status)
+      addEvent(calenderApi, entry.id, entry.startDate, entry.endDate, entry.status)
     })
   },
 
@@ -113,7 +129,7 @@ const calendarOptions = {
 
     if (response.status === 200) {
       response.data.calendarEntries.forEach(entry => {
-        addEvent(calendarApi, moment(entry.date), moment(entry.date).add(1, 'd'), entry.status)
+        addEvent(calendarApi, entry.id, moment(entry.date), moment(entry.date).add(1, 'd'), entry.status)
       })
 
       appStore.setAppMessage(200, response.data.message)

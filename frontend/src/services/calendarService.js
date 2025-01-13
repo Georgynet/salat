@@ -1,5 +1,5 @@
 import http from '@/http.js'
-import { inject } from 'vue'
+import {inject} from 'vue'
 import moment from 'moment'
 
 const useCalendarService = () => {
@@ -25,9 +25,16 @@ const useCalendarService = () => {
         })
     }
 
+    const removeEvent = async (calendarEntryId) => {
+        return await http.post('/api/user/calendar/remove-for-current-user', {
+            calendarEntryId: calendarEntryId
+        })
+    }
+
     return {
         getEvents,
-        addEvent
+        addEvent,
+        removeEvent
     }
 }
 
