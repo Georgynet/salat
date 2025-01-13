@@ -28,7 +28,7 @@ const addEvent = (calendarApi, startDate, endDate, status) => {
     start: startDate.format(appConfig.DATE_FORMAT),
     end: endDate.format(appConfig.DATE_FORMAT),
     classNames: ['event-' + status],
-    allDay: true
+    allDay: false
   })
 }
 
@@ -49,8 +49,10 @@ const calendarOptions = {
     center: 'title',
     right: 'today prev,next'
   },
+
   dayCellClassNames: function (info) {
     const weekNumber = moment(info.date).isoWeek()
+
     if (weekNumber <= currentWeek) {
       return ['disallow-week']
     }
@@ -62,6 +64,7 @@ const calendarOptions = {
 
     return ['allow-week']
   },
+
   datesSet: async (info) => {
     const calenderApi = info.view.calendar
 
@@ -75,10 +78,11 @@ const calendarOptions = {
       addEvent(calenderApi, entry.startDate, entry.endDate, entry.status)
     })
   },
+
   select: async (selectInfo) => {
-    const calendarApi = selectInfo.view.calendar
-    const weekNumber = moment(selectInfo.start).isoWeek()
-    const currentDayOfWeek = today.isoWeekday()
+    const calendarApi = selectInfo.view.calendar,
+        weekNumber = moment(selectInfo.start).isoWeek(),
+        currentDayOfWeek = today.isoWeekday()
 
     calendarApi.unselect()
 
@@ -92,8 +96,8 @@ const calendarOptions = {
       return
     }
 
-    const startDate = moment(selectInfo.startStr)
-    const endDate = moment(selectInfo.endStr)
+    const startDate = moment(selectInfo.startStr),
+        endDate = moment(selectInfo.endStr)
 
     if (calendarApi.getEventById(startDate.format(appConfig.DATE_FORMAT)) instanceof Object) {
       confirm.require({
@@ -106,8 +110,12 @@ const calendarOptions = {
     }
 
     const response = await calendarService.addEvent(startDate, endDate)
+
     if (response.status === 200) {
-      addEvent(calendarApi, startDate, endDate, appConfig.calendar.status.approved, true)
+      response.data.calendarEntries.forEach(entry => {
+        addEvent(calendarApi, moment(entry.date), moment(entry.date).add(1, 'd'), entry.status)
+      })
+
       appStore.setAppMessage(200, response.data.message)
     } else {
       appStore.setAppMessage(400, response.data.message)

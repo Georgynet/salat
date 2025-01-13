@@ -53,7 +53,7 @@ func (handler *UserCalendarHandler) Add(ctx *gin.Context) {
 	}
 
 	calendarDtos := convertCalendarModelsToDto(addedCalendarModels)
-	ctx.JSON(http.StatusBadRequest, gin.H{"message": "Not all calendar data was saved", "calendarEntries": calendarDtos})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Not all calendar data was saved", "calendarEntries": calendarDtos})
 }
 
 func (handler *UserCalendarHandler) AllUserList(ctx *gin.Context) {
