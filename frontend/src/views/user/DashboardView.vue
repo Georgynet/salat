@@ -28,7 +28,7 @@ const addEvent = (calendarApi, startDate, endDate, status) => {
     start: startDate.format(appConfig.DATE_FORMAT),
     end: endDate.format(appConfig.DATE_FORMAT),
     classNames: ['event-' + status],
-    allDay: true
+    allDay: false
   })
 }
 
@@ -113,7 +113,7 @@ const calendarOptions = {
 
     if (response.status === 200) {
       response.data.calendarEntries.forEach(entry => {
-        addEvent(calendarApi, startDate, endDate, entry.status)
+        addEvent(calendarApi, moment(entry.date), moment(entry.date).add(1, 'd'), entry.status)
       })
 
       appStore.setAppMessage(200, response.data.message)
