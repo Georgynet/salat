@@ -16,8 +16,12 @@ import {extendMoment} from 'moment-range';
 moment.locale('de')
 extendMoment(moment)
 
+import useUserStore from '@/stores/userStore.js'
 import App from '@/App.vue'
 import {router} from '@/routes.js'
+
+const {setUserToken} = useUserStore()
+setUserToken(localStorage.getItem('token') ?? null)
 
 createApp(App)
     .use(PrimeVue, {
