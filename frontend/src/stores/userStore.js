@@ -1,8 +1,15 @@
 import {ref} from 'vue'
 
-const user = ref({
-    token: localStorage.getItem('token') ?? null
-})
+const userDefaults = () => {
+    return {
+        username: null,
+        role: 'guest',
+        startRoute: 'user.dashboard',
+        token: null
+    }
+}
+
+const user = ref(userDefaults())
 
 const useUserStore = () => {
     const getUser = () => {
@@ -10,13 +17,19 @@ const useUserStore = () => {
     }
 
     const setUserToken = (token) => {
-        user.value = {
-            token
-        }
-
         if (token === null) {
             localStorage.removeItem('token')
+            user.value = userDefaults()
             return
+        }
+
+        const tokenData = JSON.parse(atob(token.split('.')[1]))
+
+        user.value = {
+            username: tokenData.username,
+            role: tokenData.role,
+            startRoute: tokenData.role === 'admin' ? 'admin.users' : 'user.dashboard',
+            token
         }
 
         localStorage.setItem('token', token)

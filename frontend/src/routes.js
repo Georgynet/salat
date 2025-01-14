@@ -10,10 +10,10 @@ import UsersView from '@/views/admin/UsersView.vue'
 
 import useUserService from '@/services/userService'
 import useUserStore from '@/stores/userStore'
-import {createWebHistory, createRouter, createWebHashHistory} from 'vue-router'
+import {createRouter, createWebHashHistory} from 'vue-router'
 
 const userService = useUserService()
-const { isAuthenticated } = useUserStore()
+const { getUser, isAuthenticated } = useUserStore()
 
 const routes = [
     {
@@ -22,7 +22,8 @@ const routes = [
         component: HomeView,
         meta: {
             label: 'Login',
-            requiresAuth: false
+            requiresAuth: false,
+            roles: ['guest']
         },
     },
     {
@@ -31,16 +32,18 @@ const routes = [
         component: RegisterView,
         meta: {
             label: 'Register',
-            requiresAuth: false
+            requiresAuth: false,
+            roles: ['guest']
         },
     },
     {
-        name: 'dashboard',
+        name: 'user.dashboard',
         path: '/user/dashboard',
         component: DashboardView,
         meta: {
             label: 'Dashboard',
-            requiresAuth: true
+            requiresAuth: true,
+            roles: ['user']
         },
     },
     {
@@ -49,7 +52,8 @@ const routes = [
         component: UsersView,
         meta: {
             label: 'Users',
-            requiresAuth: true
+            requiresAuth: true,
+            roles: ['admin']
         },
     },
     {
@@ -63,7 +67,8 @@ const routes = [
         },
         meta: {
             label: 'Logout',
-            requiresAuth: true
+            requiresAuth: true,
+            roles: ['user', 'admin']
         },
     },
     {
@@ -74,8 +79,13 @@ const routes = [
 ]
 
 const getRoutes = computed(() => {
+    const userRole = getUser().role
     return routes.filter(route => {
-        return route.meta?.requiresAuth === isAuthenticated() && route.meta.label !== undefined
+        if (route.meta === undefined) {
+            return false
+        }
+
+        return route.meta.label !== undefined && route.meta.roles.indexOf(userRole) > -1
     })
 })
 
@@ -88,7 +98,7 @@ router.beforeEach((to, from, next) => {
     if (to.name === undefined) {
         next({ name: 'notFound' })
     } else if(to.name !== 'login' && !to.meta.requiresAuth && isAuthenticated()) {
-        next({ name: 'dashboard', replace: true })
+        next({ name: getUser().startRoute, replace: true })
     } else if(to.name !== 'login' && to.meta.requiresAuth && !isAuthenticated()) {
         next({ name: 'home', replace: true })
     } else {

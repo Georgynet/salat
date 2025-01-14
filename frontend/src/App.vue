@@ -1,7 +1,8 @@
 <script setup>
-import { provide } from 'vue'
+import {onMounted, provide} from 'vue'
 import Menubar from 'primevue/menubar'
 import AppMessage from '@/components/AppMessage.vue'
+import useUserStore from '@/stores/userStore.js'
 import { getRoutes } from '@/routes.js'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
