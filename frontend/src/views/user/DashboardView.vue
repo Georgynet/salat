@@ -41,16 +41,28 @@ const calendarOptions = {
   plugins: [dayGridPlugin, interactionPlugin],
   initialView: 'dayGridMonth',
   selectable: true,
-  eventClick: async (info) => {
-    const eventId = info.event.id,
-        response = await removeEvent(eventId);
+  eventClick: (info) => {
+    confirm.require({
+      message: 'Bist du dir sicher, dass du diesen Eintrag löschen möchtest?',
+      header: 'Eintrag löschen',
+      acceptLabel: 'Ok',
+      rejectLabel: 'Cancel',
+      accept: async () => {
+        const eventId = info.event.id;
+        const response = await removeEvent(eventId);
 
-    if (response.status === 200) {
-      info.event.remove();
-      appStore.setAppMessage(200, 'This entry is successfully deleted')
-    } else {
-      appStore.setAppMessage(400, 'You can not remove past or this week entries');
-    }
+        if (response.status === 200) {
+          info.event.remove();
+          appStore.setAppMessage(200, 'This entry is successfully deleted');
+        } else {
+          appStore.setAppMessage(400, 'You can not remove past or this week entries');
+        }
+      },
+      reject: () => {
+        appStore.setAppMessage(400, 'Deletion canceled');
+      },
+      rejectClass: 'p-button-secondary'
+    });
   },
   hiddenDays: [0, 6],
   firstDay: 1,
@@ -149,6 +161,11 @@ const calendarOptions = {
 </template>
 
 <style>
+.p-dialog-footer {
+  justify-content: flex-start !important;
+  flex-direction: row-reverse !important;
+}
+
 .disallow-week {
   background-color: #f4e4a9;
 }
