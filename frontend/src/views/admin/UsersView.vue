@@ -17,10 +17,9 @@ const users = ref([])
 
 const loading = ref(true)
 const editMode = ref(false)
-const dayChangedIndex = ref('')
 
-const startDate = ref(moment().subtract(1, 'week').startOf('week'))
-const endDate = ref(moment().add(1, 'week').endOf('week'))
+const startDate = ref(moment().startOf('week'))
+const endDate = ref(moment().endOf('week'))
 const dateRange = ref(moment.range(startDate.value, endDate.value))
 
 const loadTable = async () => {
@@ -45,16 +44,17 @@ const updateDateRange = async (start, end) => {
 const dayEntry = (day, userId) => {
   const entry = entries.value.get(day.format(appConfig.DATE_FORMAT) + '_' + userId)
   if (entry !== undefined) {
-    return entry.status
+    return entry
   }
 
-  return 'noentry'
+  return null
 }
 
 const changeUserDayStatus = async (data) => {
-  toast.add({severity: 'success', summary: 'Status changed ...', life: 2000})
-  dayChangedIndex.value = data.index
-  window.setTimeout(() => { dayChangedIndex.value = '' }, 1000)
+  const changed = await usersService.changeEntryStatus(data.id, data.status)
+  if (changed) {
+    toast.add({severity: 'success', summary: 'Status changed ...', life: 2000})
+  }
 }
 
 const dates = ref([
@@ -106,9 +106,9 @@ onMounted(async () => {
         <th colspan="6">KW{{ week.isoWeek() }}</th>
       </tr>
       <tr class="border">
-        <th class="bg-gray-300 px-4 py-2 w-[200px]">User</th>
+        <th class="bg-gray-300 px-2 py-1 w-[200px]">User</th>
         <th
-            class="bg-gray-300 px-4 py-2 w-[200px]"
+            class="bg-gray-300 px-2 py-1 w-[200px]"
             v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')"
         >
           {{ day.format(appConfig.VIEW_DATE_FORMAT) }}
@@ -117,13 +117,12 @@ onMounted(async () => {
     </thead>
     <tbody>
       <tr class="border-b" v-for="user in users" :key="user.id">
-        <td class="px-4 py-2 w-[200px] border-l">{{ user.username }}</td>
+        <td class="px-2 py-1 w-[200px] border-l">{{ user.username }}</td>
         <td
-            :class="{'bg-green-100': dayChangedIndex === day.format(appConfig.DATE_FORMAT) + '_' + user.id}"
-            class="px-4 py-2 w-[200px] border-l border-r text-center"
+            class="px-2 py-1 w-[200px] border-l border-r text-center"
             v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')"
         >
-          <day-select :status="dayEntry(day, user.id)" :day="day" :user-id="user.id" @change="changeUserDayStatus" />
+          <day-select v-bind="dayEntry(day, user.id)" @change="changeUserDayStatus" />
         </td>
       </tr>
     </tbody>

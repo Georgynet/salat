@@ -15,6 +15,15 @@ const useUsersService = () => {
         return usersStore.getUsers()
     }
 
+    const changeEntryStatus = async (entryId, newStatus) => {
+        const response = await http.put('/api/user/calendar/update-calendar-entry-status', {
+            calendarEntryId: entryId,
+            newStatus: newStatus
+        })
+
+        return response.status === 200
+    }
+
     const fetchUserEntries = async (startDate, endDate) => {
         const response = await http.get('/api/user/calendar/all-user-list?start_date=' + startDate.format(appConfig.DATE_FORMAT) + '&end_date=' + endDate.format(appConfig.DATE_FORMAT))
         const users = usersStore.getUsers()
@@ -30,6 +39,7 @@ const useUsersService = () => {
     }
 
     return {
+        changeEntryStatus,
         fetchUsers,
         fetchUserEntries,
     }
