@@ -10,7 +10,7 @@ import UsersView from '@/views/admin/UsersView.vue'
 
 import useUserService from '@/services/userService'
 import useUserStore from '@/stores/userStore'
-import { createWebHistory, createRouter } from 'vue-router'
+import {createWebHistory, createRouter, createWebHashHistory} from 'vue-router'
 
 const userService = useUserService()
 const { isAuthenticated } = useUserStore()
@@ -80,7 +80,7 @@ const getRoutes = computed(() => {
 })
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes,
 })
 
