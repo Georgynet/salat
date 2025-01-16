@@ -8,6 +8,7 @@ import 'primeicons/primeicons.css'
 
 import ToastService from 'primevue/toastservice'
 import ConfirmationService from 'primevue/confirmationservice'
+import Tooltip from 'primevue/tooltip';
 
 import moment from 'moment'
 import 'moment/dist/locale/de.js'
@@ -33,4 +34,5 @@ createApp(App)
     .use(router)
     .use(ToastService)
     .use(ConfirmationService)
+    .directive('tooltip', Tooltip)
     .mount('#app')
