@@ -6,7 +6,6 @@ import fullcalendarDe from '@fullcalendar/core/locales/de'
 
 import {inject} from 'vue'
 
-
 import {useConfirm} from 'primevue/useconfirm'
 import useCalendarService from '@/services/calendarService.js'
 import moment from 'moment'
@@ -37,30 +36,48 @@ const removeEvent = async (eventId) => {
   return await calendarService.removeEvent(eventIdAsNumber);
 }
 
+const getTooltipMessage = (classNames) => {
+  if (classNames.includes('event-approved')) {
+    return 'Dein Eintrag wurde genehmigt. Guten Appetit!:)';
+  } else if (classNames.includes('event-rejected')) {
+    return 'Dein Eintrag wurde abgelehnt. Trag dich nächstes Mal rechtzeitig ein.';
+  } else if (classNames.includes('event-reserved')) {
+    return 'Dein Eintrag wurde reserviert. Wir schauen, ob es genug Proviant für alle gibt. Trag dich nächstes Mal rechtzeitig ein.';
+  }
+  return 'Keine Information verfügbar.';
+}
+
 const calendarOptions = {
   plugins: [dayGridPlugin, interactionPlugin],
   initialView: 'dayGridMonth',
   selectable: true,
   eventClick: (info) => {
+    const eventId = info.event.id,
+        weekNumber = moment(info.event.start).isoWeek(),
+        currentWeek = moment().isoWeek();
+
+    if (weekNumber === currentWeek) {
+      appStore.setAppMessage(400, 'Die Einträge dieser Woche können nicht gelöscht werden');
+      return;
+    }
+
     confirm.require({
       message: 'Bist du dir sicher, dass du diesen Eintrag löschen möchtest?',
       header: 'Eintrag löschen',
-      acceptLabel: 'Ok',
-      rejectLabel: 'Cancel',
+      acceptLabel: 'Löschen',
+      rejectLabel: 'Abbrechen',
       accept: async () => {
-        const eventId = info.event.id;
         const response = await removeEvent(eventId);
 
         if (response.status === 200) {
           info.event.remove();
-          appStore.setAppMessage(200, 'This entry is successfully deleted');
+          appStore.setAppMessage(200, 'Dieser Eintrag wurde erfolgreich gelöscht.');
         } else {
-          appStore.setAppMessage(400, 'You can not remove past or this week entries');
+          appStore.setAppMessage(400, 'Es können keine Einträge aus der Vergangenheit oder dieser Woche gelöscht werden');
         }
       },
-      reject: () => {
-        appStore.setAppMessage(400, 'Deletion canceled');
-      },
+
+      reject: () => appStore.setAppMessage(400, 'Löschung abgebrochen'),
       rejectClass: 'p-button-secondary'
     });
   },
@@ -110,13 +127,14 @@ const calendarOptions = {
   select: async (selectInfo) => {
     const calendarApi = selectInfo.view.calendar,
         weekNumber = moment(selectInfo.start).isoWeek(),
+        currentWeek = moment().isoWeek(),
         currentDayOfWeek = today.isoWeekday()
 
     calendarApi.unselect()
 
     if (weekNumber < currentWeek || (weekNumber === currentWeek && currentDayOfWeek >= 5 && currentDayOfWeek <= 7)) {
       confirm.require({
-        message: 'Entry is no longer possible this week.',
+        message: 'Eintrag für diese Woche nicht mehr möglich',
         header: 'Not possible',
         acceptLabel: 'Ok',
         rejectClass: '!hidden'
@@ -129,7 +147,7 @@ const calendarOptions = {
 
     if (calendarApi.getEventById(startDate.format(appConfig.DATE_FORMAT)) instanceof Object) {
       confirm.require({
-        message: 'You have already made an entry on this day.',
+        message: 'Du hast an diesem Tag bereits einen Eintrag gemacht',
         header: 'Duplicate entry',
         acceptLabel: 'Ok',
         rejectClass: '!hidden'
@@ -144,9 +162,9 @@ const calendarOptions = {
         addEvent(calendarApi, entry.id, moment(entry.date), moment(entry.date).add(1, 'd'), entry.status)
       })
 
-      appStore.setAppMessage(200, response.data.message)
+      appStore.setAppMessage(200, 'Kalenderdaten wurden gespeichert')
     } else {
-      appStore.setAppMessage(400, response.data.message)
+      appStore.setAppMessage(400, 'Kalenderdaten könten nicht gespeichert werden')
     }
   }
 }
@@ -155,7 +173,10 @@ const calendarOptions = {
 <template>
   <FullCalendar ref="calendarContainer" :options="calendarOptions">
     <template #eventContent="arg">
-      <strong>{{ arg.event.title }}</strong>
+      <div class="calendar-entry" v-tooltip.bottom="getTooltipMessage(arg.event.classNames)"><img
+          style="margin-right: 7px"
+          src="@/assets/salat.svg" alt="salat icon">{{ arg.event.title }}
+      </div>
     </template>
   </FullCalendar>
 </template>
@@ -164,6 +185,36 @@ const calendarOptions = {
 .p-dialog-footer {
   justify-content: flex-start !important;
   flex-direction: row-reverse !important;
+}
+
+.p-tooltip {
+  font-size: 12px;
+  min-width: 295px;
+  padding: 8px;
+}
+
+.fc-daygrid-dot-event:hover {
+  cursor: pointer;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+  background-color: #d2c288;
+}
+
+.fc .fc-daygrid-week-number {
+  background-color: transparent;
+}
+
+.fc .fc-daygrid-day-number {
+  color: #474242;
+}
+
+.calendar-entry {
+  display: flex;
+  justify-content: space-around;
+  align-items: baseline;
+  padding: 5px 5px 5px 15px;
+  font-size: 18px;
 }
 
 .disallow-week {
