@@ -3,6 +3,7 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import fullcalendarDe from '@fullcalendar/core/locales/de'
+import {onMounted} from 'vue';
 
 import {inject} from 'vue'
 
@@ -10,6 +11,15 @@ import {useConfirm} from 'primevue/useconfirm'
 import useCalendarService from '@/services/calendarService.js'
 import moment from 'moment'
 import useAppStore from '@/stores/appStore.js'
+
+import unicorn1 from '@/assets/unicorn.png';
+import unicorn3 from '@/assets/unicorn2.png';
+import unicorn2 from '@/assets/unicorn1.png';
+import unicorn4 from '@/assets/unicorn3.png';
+import unicorn5 from '@/assets/unicorn4.png';
+
+const unicornImages = [unicorn1, unicorn2, unicorn3, unicorn4, unicorn5];
+const randomUnicornImage = unicornImages[Math.floor(Math.random() * unicornImages.length)];
 
 const appConfig = inject('config')
 
@@ -19,6 +29,7 @@ const confirm = useConfirm()
 
 const today = moment()
 const currentWeek = today.isoWeek()
+
 
 const addEvent = (calendarApi, id, startDate, endDate, status) => {
   calendarApi.addEvent({
@@ -42,7 +53,7 @@ const getTooltipMessage = (classNames) => {
   } else if (classNames.includes('event-rejected')) {
     return 'Dein Eintrag wurde abgelehnt. Trag dich nächstes Mal rechtzeitig ein.';
   } else if (classNames.includes('event-reserved')) {
-    return 'Dein Eintrag wurde reserviert. Wir schauen, ob es genug Proviant für alle gibt. Trag dich nächstes Mal rechtzeitig ein.';
+    return 'Dein Eintrag wurde reserviert. Wir schauen, ob es genug Salat für alle gibt. Trag dich nächstes Mal rechtzeitig ein.';
   }
   return 'Keine Information verfügbar.';
 }
@@ -51,6 +62,15 @@ const calendarOptions = {
   plugins: [dayGridPlugin, interactionPlugin],
   initialView: 'dayGridMonth',
   selectable: true,
+  validRange: {
+    end: moment().startOf('week').add(3, 'weeks').endOf('week').toISOString()
+  },
+  headerToolbar: {
+    left: '',
+    center: 'title',
+    right: 'today prev,next'
+  },
+  initialDate: moment().toISOString(),
   eventClick: (info) => {
     const eventId = info.event.id,
         weekNumber = moment(info.event.start).isoWeek(),
@@ -88,11 +108,6 @@ const calendarOptions = {
   defaultAllDay: true,
   dayHeaderFormat: {
     weekday: 'long'
-  },
-  headerToolbar: {
-    left: '',
-    center: 'title',
-    right: 'today prev,next'
   },
 
   dayCellClassNames: function (info) {
@@ -168,6 +183,24 @@ const calendarOptions = {
     }
   }
 }
+
+onMounted(() => {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = `
+    .fc .fc-daygrid-day.fc-day-today::before {
+      content: '';
+      background-image: url('${randomUnicornImage}');
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      z-index: 10;
+      background-repeat: no-repeat;
+      right: 5px;
+      bottom: 0;
+    }
+  `;
+  document.head.appendChild(styleElement);
+});
 </script>
 
 <template>
@@ -199,6 +232,7 @@ const calendarOptions = {
 
 .fc .fc-daygrid-day.fc-day-today {
   background-color: #d2c288;
+  position: relative;
 }
 
 .fc .fc-daygrid-week-number {
@@ -215,6 +249,7 @@ const calendarOptions = {
   align-items: baseline;
   padding: 5px 5px 5px 15px;
   font-size: 18px;
+  color: #fff;
 }
 
 .disallow-week {
@@ -234,6 +269,6 @@ const calendarOptions = {
 }
 
 .event-reserved {
-  background-color: #baa71b;
+  background-color: #dfc92b;
 }
 </style>
