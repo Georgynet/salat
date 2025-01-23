@@ -56,7 +56,7 @@ func (handler *RealDayStatsHandler) GetNumberOfPlatesForDay(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusBadRequest, gin.H{"numberOfPlates": handler.RealDayStatsRepo.GetStatsForDay(statsDay)})
+	ctx.JSON(http.StatusOK, gin.H{"numberOfPlates": handler.RealDayStatsRepo.GetStatsForDay(statsDay)})
 }
 
 func getStatsDateFromRequest(ctx *gin.Context) (time.Time, error) {

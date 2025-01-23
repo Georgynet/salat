@@ -2,7 +2,7 @@
 import moment from 'moment'
 import {inject, onMounted, ref} from 'vue'
 import useUsersService from '@/services/usersService.js'
-import { useToast } from 'primevue/usetoast'
+import {useToast} from 'primevue/usetoast'
 
 import DatePicker from 'primevue/datepicker'
 import DaySelect from '@/components/DaySelect.vue'
@@ -17,6 +17,8 @@ const users = ref([])
 
 const loading = ref(true)
 const editMode = ref(false)
+
+const platesNumbers = ref({});
 
 const startDate = ref(moment().startOf('week'))
 const endDate = ref(moment().endOf('week'))
@@ -38,6 +40,15 @@ const updateDateRange = async (start, end) => {
   endDate.value = end.endOf('week')
   dateRange.value = moment.range(startDate.value, endDate.value)
   editMode.value = false
+
+  const weekdays = Array.from(moment.range(startDate.value, endDate.value).by('days')).filter(day => {
+    return day.isoWeekday() >= 1 && day.isoWeekday() <= 5;
+  });
+
+  for (let day of weekdays) {
+    const statsDay = day.format('YYYY-MM-DD');
+    platesNumbers.value[day.format('YYYY-MM-DD')] = await usersService.fetchNumberOfPlates(statsDay);
+  }
   await loadTable()
 }
 
@@ -58,8 +69,8 @@ const changeUserDayStatus = async (data) => {
 }
 
 const dates = ref([
-    startDate.value.toDate(),
-    endDate.value.toDate()
+  startDate.value.toDate(),
+  endDate.value.toDate()
 ])
 
 const changeDates = () => {
@@ -69,11 +80,53 @@ const changeDates = () => {
   }
 }
 
-onMounted(async () => {
-  const usersMap = await usersService.fetchUsers()
-  users.value = Array.from(usersMap.entries()).map(([id, user]) => ({ id, ...user }))
+const countApprovedPerDay = (day) => {
+  return users.value.reduce((count, user) => {
+    const entry = dayEntry(day, user.id);
+    if (entry && entry.status === 'approved') {
+      count++;
+    }
+    return count;
+  }, 0);
+};
 
-  await loadTable()
+
+const savePlatesNumber = async (day) => {
+  try {
+    const statsDay = day.format('YYYY-MM-DD[T]HH:mm:ss[Z]');
+    const numberOfPlates = parseInt(platesNumbers.value[day.format('YYYY-MM-DD')], 10);
+
+    const success = await usersService.savePlatesNumber(statsDay, numberOfPlates);
+
+    if (success) {
+      toast.add({severity: 'success', summary: 'Number of plates saved!', life: 2000});
+    } else {
+      toast.add({severity: 'error', summary: 'Failed to save plates number.', life: 2000});
+    }
+  } catch (error) {
+    console.error('Error saving number of plates:', error);
+    toast.add({severity: 'error', summary: 'Error saving number of plates', life: 2000});
+  }
+}
+
+onMounted(async () => {
+  try {
+    const usersMap = await usersService.fetchUsers();
+    users.value = Array.from(usersMap.entries()).map(([id, user]) => ({id, ...user}));
+
+    const weekdays = Array.from(moment.range(startDate.value, endDate.value).by('days')).filter(day => {
+      return day.isoWeekday() >= 1 && day.isoWeekday() <= 5;
+    });
+
+    for (let day of weekdays) {
+      const statsDay = day.format('YYYY-MM-DD');
+      platesNumbers.value[day.format('YYYY-MM-DD')] = await usersService.fetchNumberOfPlates(statsDay);
+    }
+
+    await loadTable();
+  } catch (error) {
+    console.error('Error during component mounting:', error);
+  }
 })
 </script>
 
@@ -102,32 +155,81 @@ onMounted(async () => {
 
   <table class="mx-auto table-auto mb-4" v-if="!loading" v-for="week in dateRange.by('weeks')">
     <thead>
-      <tr>
-        <th colspan="6">KW{{ week.isoWeek() }}</th>
-      </tr>
-      <tr class="border">
-        <th class="bg-gray-300 px-2 py-1 w-[200px]">User</th>
-        <th
-            class="bg-gray-300 px-2 py-1 w-[200px]"
-            v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')"
-        >
-          {{ day.format(appConfig.VIEW_DATE_FORMAT) }}
-        </th>
-      </tr>
+    <tr>
+      <th colspan="6">KW{{ week.isoWeek() }}</th>
+    </tr>
+    <tr class="border">
+      <th class="bg-gray-300 px-2 py-1 w-[200px]">User</th>
+      <th
+          class="bg-gray-300 px-2 py-1 w-[200px]"
+          v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')"
+      >
+        {{ day.format(appConfig.VIEW_DATE_FORMAT) }}
+      </th>
+    </tr>
     </thead>
     <tbody>
-      <tr class="border-b" v-for="user in users" :key="user.id">
-        <td class="px-2 py-1 w-[200px] border-l">{{ user.username }}</td>
-        <td
-            class="px-2 py-1 w-[200px] border-l border-r text-center"
-            v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')"
-        >
-          <day-select v-bind="dayEntry(day, user.id)" @change="changeUserDayStatus" />
-        </td>
-      </tr>
+    <tr class="border-b" v-for="user in users" :key="user.id">
+      <td class="px-2 py-1 w-[200px] border-l">{{ user.username }}</td>
+      <td
+          class="px-2 py-1 w-[200px] border-l border-r text-center"
+          v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')"
+      >
+        <day-select v-bind="dayEntry(day, user.id)" @change="changeUserDayStatus"/>
+      </td>
+    </tr>
+    <tr class="statistics border-t font-bold">
+      <td class="px-2 py-1 w-[200px] border-l" style="background: #fdfdfd8a">Mit Status 'Approved':</td>
+      <td
+          class="px-2 py-1 w-[200px] border-l border-r text-center" style="background: #fdfdfd8a"
+          v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')"
+      >
+        {{ countApprovedPerDay(day) }}
+      </td>
+    </tr>
+    <tr class="statistics border-t font-bold">
+      <td class="px-2 py-1 w-[200px] border-l" style="background: #fdfdfd8a">Tatsächliche Anzahl der Leute:</td>
+      <td
+          class="px-2 py-1 w-[200px] border-l border-r text-center" style="background: #fdfdfd8a"
+          v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')"
+      >
+        <div class="total-people-group">
+          <input
+              class="total-people-input"
+              :placeholder="platesNumbers[day.format('YYYY-MM-DD')] || 0"
+              v-model="platesNumbers[day.format('YYYY-MM-DD')]">
+          <button class="total-people-button" @click="savePlatesNumber(day)">Ok</button>
+        </div>
+      </td>
+    </tr>
     </tbody>
   </table>
   <div v-else>
     Loading ...
   </div>
 </template>
+
+<style>
+.total-people-group {
+  display: flex;
+  justify-content: space-around;
+}
+
+.total-people-input {
+  max-width: 90px;
+  background: #fdfdfd8a;
+  border-radius: 5px;
+  padding: 3px 15px;
+  outline: none;
+}
+
+.total-people-button {
+  background-color: #7272758f;
+  padding: 7px 15px;
+  border-radius: 5px;
+}
+
+.total-people-button:hover {
+  background-color: #727275;
+}
+</style>
