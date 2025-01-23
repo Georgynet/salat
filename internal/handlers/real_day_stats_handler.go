@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/DevPulseLab/salat/internal/db/repositories"
 	"github.com/DevPulseLab/salat/internal/forms"
@@ -49,11 +50,28 @@ func (handler *RealDayStatsHandler) SaveNumberOfPlatesForDay(ctx *gin.Context) {
 }
 
 func (handler *RealDayStatsHandler) GetNumberOfPlatesForDay(ctx *gin.Context) {
-	var form forms.GetNumberOfPlatesForDayForm
-	if err := ctx.ShouldBindJSON(&form); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	statsDay, err := getStatsDateFromRequest(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid stats_date format. Use YYYY-MM-DD."})
 		return
 	}
 
-	ctx.JSON(http.StatusBadRequest, gin.H{"numberOfPlates": handler.RealDayStatsRepo.GetStatsForDay(form.StatsDay)})
+	ctx.JSON(http.StatusOK, gin.H{"numberOfPlates": handler.RealDayStatsRepo.GetStatsForDay(statsDay)})
+}
+
+func getStatsDateFromRequest(ctx *gin.Context) (time.Time, error) {
+	statsDate := ctx.DefaultQuery("stats_date", "")
+
+	var startDate time.Time
+	if statsDate == "" {
+		startDate = time.Now()
+	} else {
+		var err error
+		startDate, err = parseDate(statsDate)
+		if err != nil {
+			return time.Time{}, err
+		}
+	}
+
+	return time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, startDate.Location()), nil
 }

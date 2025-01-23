@@ -25,12 +25,33 @@
         color: #f0f0f0;
     }
 
+    .bg-gray-300 {
+        background-color: #727275e0;
+    }
+
+    .p-tag-secondary {
+        background-color: #fdfdfd8a !important;
+    }
+
     .p-menubar-item:not(.p-disabled) > .p-menubar-item-content:hover {
         background: #7272758f;
     }
 }
 
-@media (prefers-color-scheme: light)
+@media (prefers-color-scheme: light) {
+    .total-people-input {
+        background-color: #d1fae5 !important;
+    }
 
-[
-]
+    .statistics {
+        background-color: #ecfdf5 !important;
+    }
+
+    .total-people-button {
+        background-color: #10b981 !important;
+    }
+
+    .total-people-button:hover {
+        background-color: #059669 !important;
+    }
+}

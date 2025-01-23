@@ -37,11 +37,37 @@ const useUsersService = () => {
 
         return entries
     }
+    const fetchNumberOfPlates = async (statsDay) => {
+        try {
+            const response = await http.get('/api/stats/get-number-of-plates', {
+                params: {stats_date: statsDay}
+            });
+            return response.data.numberOfPlates;
+        } catch (error) {
+            console.error('Can not become a number of plates', error);
+            return 0;
+        }
+    }
+
+    const savePlatesNumber = async (statsDay, numberOfPlates) => {
+        try {
+            const response = await http.post('/api/stats/save-number-of-plates', {
+                statsDay,
+                numberOfPlates
+            });
+            return response.status === 200;
+        } catch (error) {
+            console.error('Error saving plates number:', error);
+            return false;
+        }
+    }
 
     return {
         changeEntryStatus,
         fetchUsers,
         fetchUserEntries,
+        fetchNumberOfPlates,
+        savePlatesNumber
     }
 }
 
