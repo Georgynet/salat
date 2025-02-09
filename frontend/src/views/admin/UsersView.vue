@@ -64,6 +64,7 @@ const dayEntry = (day, userId) => {
 const changeUserDayStatus = async (data) => {
   const changed = await usersService.changeEntryStatus(data.id, data.status)
   if (changed) {
+    await loadTable()
     toast.add({severity: 'success', summary: 'Status changed ...', life: 2000})
   }
 }
