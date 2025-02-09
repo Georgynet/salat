@@ -11,6 +11,8 @@ const appStore = useAppStore()
 
 provide('config', {
   VIEW_DATE_FORMAT: 'DD.MM.YYYY',
+  VIEW_DATE_WITH_WEEKDAY_FORMAT: 'ddd DD.MM.YYYY',
+  VIEW_MONTH_FORMAT: 'MMMM YYYY',
   DATE_FORMAT: 'YYYY-MM-DD',
   DATETIME_FORMAT: 'YYYY-MM-DD\\THH:mm:ss\\Z',
   calendar: {

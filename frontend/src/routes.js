@@ -7,6 +7,7 @@ import RegisterView from '@/views/RegisterView.vue'
 
 import DashboardView from '@/views/user/DashboardView.vue'
 import UsersView from '@/views/admin/UsersView.vue'
+import StatsView from '@/views/admin/StatsView.vue'
 
 import useUserService from '@/services/userService'
 import useUserStore from '@/stores/userStore'
@@ -52,6 +53,16 @@ const routes = [
         component: UsersView,
         meta: {
             label: 'Users',
+            requiresAuth: true,
+            roles: ['admin']
+        },
+    },
+    {
+        name: 'admin.stats',
+        path: '/admin/statistics',
+        component: StatsView,
+        meta: {
+            label: 'Statistics',
             requiresAuth: true,
             roles: ['admin']
         },

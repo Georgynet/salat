@@ -46,8 +46,8 @@ const updateDateRange = async (start, end) => {
   });
 
   for (let day of weekdays) {
-    const statsDay = day.format('YYYY-MM-DD');
-    platesNumbers.value[day.format('YYYY-MM-DD')] = await usersService.fetchNumberOfPlates(statsDay);
+    const statsDay = day.format(appConfig.DATE_FORMAT);
+    platesNumbers.value[statsDay] = await usersService.fetchNumberOfPlates(statsDay);
   }
   await loadTable()
 }
@@ -94,8 +94,8 @@ const countApprovedPerDay = (day) => {
 
 const savePlatesNumber = async (day) => {
   try {
-    const statsDay = day.format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    const numberOfPlates = parseInt(platesNumbers.value[day.format('YYYY-MM-DD')], 10);
+    const statsDay = day.format(appConfig.DATETIME_FORMAT);
+    const numberOfPlates = parseInt(platesNumbers.value[day.format(appConfig.DATE_FORMAT)], 10);
 
     const success = await usersService.savePlatesNumber(statsDay, numberOfPlates);
 
@@ -120,8 +120,8 @@ onMounted(async () => {
     });
 
     for (let day of weekdays) {
-      const statsDay = day.format('YYYY-MM-DD');
-      platesNumbers.value[day.format('YYYY-MM-DD')] = await usersService.fetchNumberOfPlates(statsDay);
+      const statsDay = day.format(appConfig.DATE_FORMAT);
+      platesNumbers.value[statsDay] = await usersService.fetchNumberOfPlates(statsDay);
     }
 
     await loadTable();
@@ -197,8 +197,8 @@ onMounted(async () => {
         <div class="total-people-group">
           <input
               class="total-people-input"
-              :placeholder="platesNumbers[day.format('YYYY-MM-DD')] || 0"
-              v-model="platesNumbers[day.format('YYYY-MM-DD')]">
+              :placeholder="platesNumbers[day.format(appConfig.DATE_FORMAT)] || 0"
+              v-model="platesNumbers[day.format(appConfig.DATE_FORMAT)]">
           <button class="total-people-button" @click="savePlatesNumber(day)">Ok</button>
         </div>
       </td>
