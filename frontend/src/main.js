@@ -3,7 +3,7 @@ import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
 import primeVueLocale from 'primelocale/de.json'
 
-import '@/style.css'
+import '@/style.scss'
 import 'primeicons/primeicons.css'
 
 import ToastService from 'primevue/toastservice'
@@ -27,7 +27,10 @@ setUserToken(localStorage.getItem('token') ?? null)
 createApp(App)
     .use(PrimeVue, {
         theme: {
-            preset: Aura
+            preset: Aura,
+            options: {
+                darkModeSelector: '.dark-mode',
+            }
         },
         locale: primeVueLocale.de
     })

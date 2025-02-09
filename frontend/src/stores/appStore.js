@@ -28,9 +28,35 @@ const useAppStore = () => {
         }
     }
 
+    const isDarkModeEnabled = ref(localStorage.getItem('darkMode') === 'true' ?? false)
+    const toggleDarkMode = () => {
+        if (isDarkModeEnabled.value) {
+            disableDarkMode()
+            return
+        }
+
+        enableDarkMode()
+    }
+
+    const enableDarkMode = () => {
+        document.documentElement.classList.add('dark-mode')
+        isDarkModeEnabled.value = true
+        localStorage.setItem('darkMode', 'true')
+    }
+
+    const disableDarkMode = () => {
+        document.documentElement.classList.remove('dark-mode')
+        isDarkModeEnabled.value = false
+        localStorage.setItem('darkMode', 'false')
+    }
+
     return {
         setAppMessage,
-        appMessage
+        appMessage,
+        isDarkModeEnabled,
+        enableDarkMode,
+        disableDarkMode,
+        toggleDarkMode,
     }
 }
 

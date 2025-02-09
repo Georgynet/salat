@@ -2,10 +2,12 @@
 import {onMounted, provide} from 'vue'
 import Menubar from 'primevue/menubar'
 import AppMessage from '@/components/AppMessage.vue'
-import useUserStore from '@/stores/userStore.js'
 import { getRoutes } from '@/routes.js'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
+import useAppStore from '@/stores/appStore.js'
+
+const appStore = useAppStore()
 
 provide('config', {
   VIEW_DATE_FORMAT: 'DD.MM.YYYY',
@@ -26,10 +28,20 @@ provide('config', {
     }
   }
 })
+
+onMounted(() => {
+  if (appStore.isDarkModeEnabled.value) {
+    appStore.enableDarkMode()
+  }
+})
 </script>
 
 <template>
   <div class="container mt-10 mx-5 md:mx-auto">
+    <button label="Toggle Dark Mode" class="float-right" @click="appStore.toggleDarkMode()">
+      <i class="pi" :class="{'pi-moon': !appStore.isDarkModeEnabled.value, 'pi-sun': appStore.isDarkModeEnabled.value}"></i>
+    </button>
+
     <h1 class="text-3xl font-bold mb-4 text-center">
       SalatBar App
     </h1>

@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.fc .fc-button-primary:disabled {
+    background-color: #989898;
+    opacity: 100%;
+}
+
+.fc .fc-button-primary {
+    background-color: #5d5e5f;
+    border: none;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: #4f5152;
+    cursor: pointer;
+}
+
+html {
+    &.dark-mode {
+        body,
+        .p-menubar {
+            background: #333333 !important;
+            color: #f0f0f0;
+        }
+
+        .bg-gray-300 {
+            background-color: #727275e0;
+        }
+
+        .p-tag-secondary {
+            background-color: #fdfdfd8a !important;
+        }
+
+        .p-menubar-item:not(.p-disabled) > .p-menubar-item-content:hover {
+            background: #7272758f;
+        }
+    }
+
+    &:not(.dark-mode) {
+        .total-people-input {
+            background-color: #d1fae5 !important;
+        }
+
+        .statistics {
+            background-color: #ecfdf5 !important;
+        }
+
+        .total-people-button {
+            background-color: #10b981 !important;
+        }
+
+        .total-people-button:hover {
+            background-color: #059669 !important;
+        }
+    }
+}
