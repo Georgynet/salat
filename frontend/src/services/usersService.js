@@ -25,7 +25,12 @@ const useUsersService = () => {
     }
 
     const fetchUserEntries = async (startDate, endDate) => {
-        const response = await http.get('/api/user/calendar/all-user-list?start_date=' + startDate.format(appConfig.DATE_FORMAT) + '&end_date=' + endDate.format(appConfig.DATE_FORMAT))
+        const response = await http.get('/api/user/calendar/all-user-list', {
+            params: {
+                start_date:  startDate.format(appConfig.DATE_FORMAT),
+                end_date: endDate.format(appConfig.DATE_FORMAT)
+            }
+        })
         const users = usersStore.getUsers()
 
         const entries = new Map()
