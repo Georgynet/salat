@@ -1,19 +1,12 @@
 <script setup>
-import {onMounted, ref} from 'vue'
-import useAppStore from '@/stores/appStore'
+import {onMounted} from 'vue'
 import { useRouter } from 'vue-router'
 import useUserService from '@/services/userService'
 import useUserStore from '@/stores/userStore'
 
-import InputGroup from 'primevue/inputgroup'
-import InputGroupAddon from 'primevue/inputgroupaddon'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
-import Button from 'primevue/button'
-import Card from 'primevue/card'
-
 const router = useRouter()
 const userService = useUserService()
+const { getUser } = useUserStore()
 
 onMounted(async () => {
   await userService.login()
