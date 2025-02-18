@@ -58,9 +58,24 @@ const getTooltipMessage = (classNames) => {
   return 'Keine Information verfügbar.';
 }
 
+const isFullWindow = () => {
+  return window.innerWidth >= 820
+}
+
+const updateCalendarSize = (calendar) => {
+  if (isFullWindow()) {
+    calendar.changeView('dayGridMonth')
+    calendar.setOption('height', 'auto')
+  } else {
+    calendar.changeView('dayGridWeek')
+    calendar.setOption('height', 290)
+  }
+}
+
 const calendarOptions = {
   plugins: [dayGridPlugin, interactionPlugin],
-  initialView: 'dayGridMonth',
+  initialView: isFullWindow() ? 'dayGridMonth' : 'dayGridWeek',
+  height: isFullWindow() ? 'auto' : 290,
   selectable: true,
   validRange: {
     end: moment().startOf('week').add(3, 'weeks').endOf('week').toISOString()
@@ -108,6 +123,10 @@ const calendarOptions = {
   defaultAllDay: true,
   dayHeaderFormat: {
     weekday: 'long'
+  },
+
+  windowResize: (info) => {
+    updateCalendarSize(info.view.calendar)
   },
 
   dayCellClassNames: function (info) {
@@ -204,14 +223,22 @@ onMounted(() => {
 </script>
 
 <template>
-  <FullCalendar ref="calendarContainer" :options="calendarOptions">
-    <template #eventContent="arg">
-      <div class="calendar-entry" v-tooltip.bottom="getTooltipMessage(arg.event.classNames)"><img
-          style="margin-right: 7px"
-          src="@/assets/salat.svg" alt="salat icon">{{ arg.event.title }}
+  <div class="relative">
+    <div class="mobile-rotate absolute z-50 inset-0 text-center">
+      <div class=" p-16 bg-white w-60 rounded-full inline-block">
+        <img src="@/assets/mobile-rotate-rotation-icon.svg" alt="">
       </div>
-    </template>
-  </FullCalendar>
+    </div>
+
+    <FullCalendar ref="calendarContainer" :options="calendarOptions">
+      <template #eventContent="arg">
+        <div class="calendar-entry" v-tooltip.bottom="getTooltipMessage(arg.event.classNames)"><img
+            style="margin-right: 7px"
+            src="@/assets/salat.svg" alt="salat icon">{{ arg.event.title }}
+        </div>
+      </template>
+    </FullCalendar>
+  </div>
 </template>
 
 <style>

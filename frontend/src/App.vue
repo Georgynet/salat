@@ -42,7 +42,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="container mt-10 mx-5 md:mx-auto">
+  <div class="container p-2 xl:mt-10 md:mx-auto">
     <button label="Toggle Dark Mode" class="float-right" @click="appStore.toggleDarkMode()">
       <i class="pi" :class="{'pi-moon': !appStore.isDarkModeEnabled.value, 'pi-sun': appStore.isDarkModeEnabled.value}"></i>
     </button>
@@ -51,7 +51,7 @@ onMounted(() => {
       SalatBar App
     </h1>
 
-    <Menubar :model="routes" class="mb-4" v-if="Object.values(routes).length > 0">
+    <Menubar :model="routes" class="mb-4" v-if="Object.values(routes).length > 1">
       <template #item="{ item, props }">
         <router-link v-slot="{ href, navigate }" :to="{ name: item.name }">
           <a :href="href" v-bind="props.action" @click="navigate">
