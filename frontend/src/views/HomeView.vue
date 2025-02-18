@@ -20,5 +20,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  Bitte warten ...
+  <div class="text-center">
+    <div class="my-4">
+      <span class="pi pi-spin pi-spinner !text-4xl"></span>
+    </div>
+    Bitte warten ...<br />
+    Du wirst eingeloggt.
+  </div>
 </template>
