@@ -89,7 +89,7 @@ func (handler *AuthHandler) CloudflareSSO(ctx *gin.Context) {
 
 		user, err = handler.UserRepo.FindByUsername(email)
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Could nor found created user"})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Could not found created user"})
 			return
 		}
 	}

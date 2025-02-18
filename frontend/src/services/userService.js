@@ -2,11 +2,8 @@ import http from '@/http.js'
 import useUserStore from '@/stores/userStore'
 
 const useUserService = () => {
-    const login = async (username, password) => {
-        const response = await http.post('/api/login', {
-            username,
-            password
-        })
+    const login = async () => {
+        const response = await http.post('/api/register/cloudflare')
 
         if (response.status !== 200) {
             return false
