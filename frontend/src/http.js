@@ -20,9 +20,9 @@ const handleError = (error) => {
     }
 
     if (error.response.status === 401) {
-        appStore.setAppMessage(400, 'Token ist abgelaufen')
+        appStore.setAppMessage(400, error.response.data.error ?? 'Token ist abgelaufen')
         userStore.setUserToken(null)
-        return
+        return error.response
     }
 
     if (error.response.status !== undefined) {
