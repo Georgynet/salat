@@ -22,17 +22,6 @@ const routes = [
         path: '/',
         component: HomeView,
         meta: {
-            label: 'Login',
-            requiresAuth: false,
-            roles: ['guest']
-        },
-    },
-    {
-        name: 'register',
-        path: '/register',
-        component: RegisterView,
-        meta: {
-            label: 'Register',
             requiresAuth: false,
             roles: ['guest']
         },
