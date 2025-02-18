@@ -38,6 +38,10 @@ http.interceptors.request.use((config) => {
         config.headers['Authorization'] = 'Bearer ' + user.token;
     }
 
+    if (import.meta.env.VITE_LOGIN_EMAIL !== '') {
+        config.headers['Cf-Access-Authenticated-User-Email'] = import.meta.env.VITE_LOGIN_EMAIL;
+    }
+
     return config
 }, (error) => {
     return handleError(error)

@@ -3,7 +3,6 @@ import {computed} from 'vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 
 import HomeView from '@/views/HomeView.vue'
-import RegisterView from '@/views/RegisterView.vue'
 
 import DashboardView from '@/views/user/DashboardView.vue'
 import UsersView from '@/views/admin/UsersView.vue'
@@ -77,7 +76,7 @@ const routes = [
     },
 ]
 
-const getRoutes = computed(() => {
+const getRoutes = () => {
     const userRole = getUser().role
     return routes.filter(route => {
         if (route.meta === undefined) {
@@ -86,7 +85,7 @@ const getRoutes = computed(() => {
 
         return route.meta.label !== undefined && route.meta.roles.indexOf(userRole) > -1
     })
-})
+}
 
 const router = createRouter({
     history: createWebHashHistory(),
