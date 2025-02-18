@@ -4,7 +4,6 @@ import useUserStore from '@/stores/userStore'
 const useUserService = () => {
     const login = async () => {
         const response = await http.post('/api/register/cloudflare')
-
         if (response.status !== 200) {
             return false
         }
