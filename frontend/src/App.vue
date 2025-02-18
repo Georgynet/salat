@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, provide} from 'vue'
+import {onMounted, provide, ref} from 'vue'
 import Menubar from 'primevue/menubar'
 import AppMessage from '@/components/AppMessage.vue'
 import { getRoutes } from '@/routes.js'
@@ -31,7 +31,10 @@ provide('config', {
   }
 })
 
+const routes = ref({})
+
 onMounted(() => {
+  routes.value = getRoutes()
   if (appStore.isDarkModeEnabled.value) {
     appStore.enableDarkMode()
   }
@@ -48,7 +51,7 @@ onMounted(() => {
       SalatBar App
     </h1>
 
-    <Menubar :model="getRoutes" class="mb-4">
+    <Menubar :model="routes" class="mb-4" v-if="Object.values(routes).length > 0">
       <template #item="{ item, props }">
         <router-link v-slot="{ href, navigate }" :to="{ name: item.name }">
           <a :href="href" v-bind="props.action" @click="navigate">

@@ -66,7 +66,6 @@ const routes = [
             }
         },
         meta: {
-            label: 'Logout',
             requiresAuth: true,
             roles: ['user', 'admin']
         },
