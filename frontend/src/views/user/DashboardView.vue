@@ -58,9 +58,24 @@ const getTooltipMessage = (classNames) => {
   return 'Keine Information verfügbar.';
 }
 
+const isFullWindow = () => {
+  return window.innerWidth >= 820
+}
+
+const updateCalendarSize = (calendar) => {
+  if (isFullWindow()) {
+    calendar.changeView('dayGridMonth')
+    calendar.setOption('height', 'auto')
+  } else {
+    calendar.changeView('dayGridWeek')
+    calendar.setOption('height', 290)
+  }
+}
+
 const calendarOptions = {
   plugins: [dayGridPlugin, interactionPlugin],
-  initialView: 'dayGridMonth',
+  initialView: isFullWindow() ? 'dayGridMonth' : 'dayGridWeek',
+  height: isFullWindow() ? 'auto' : 290,
   selectable: true,
   validRange: {
     end: moment().startOf('week').add(3, 'weeks').endOf('week').toISOString()
@@ -108,6 +123,10 @@ const calendarOptions = {
   defaultAllDay: true,
   dayHeaderFormat: {
     weekday: 'long'
+  },
+
+  windowResize: (info) => {
+    updateCalendarSize(info.view.calendar)
   },
 
   dayCellClassNames: function (info) {
