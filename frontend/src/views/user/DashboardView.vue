@@ -223,14 +223,22 @@ onMounted(() => {
 </script>
 
 <template>
-  <FullCalendar ref="calendarContainer" :options="calendarOptions">
-    <template #eventContent="arg">
-      <div class="calendar-entry" v-tooltip.bottom="getTooltipMessage(arg.event.classNames)"><img
-          style="margin-right: 7px"
-          src="@/assets/salat.svg" alt="salat icon">{{ arg.event.title }}
+  <div class="relative">
+    <div class="mobile-rotate absolute z-50 inset-0 text-center">
+      <div class=" p-16 bg-white w-60 rounded-full inline-block">
+        <img src="@/assets/mobile-rotate-rotation-icon.svg" alt="">
       </div>
-    </template>
-  </FullCalendar>
+    </div>
+
+    <FullCalendar ref="calendarContainer" :options="calendarOptions">
+      <template #eventContent="arg">
+        <div class="calendar-entry" v-tooltip.bottom="getTooltipMessage(arg.event.classNames)"><img
+            style="margin-right: 7px"
+            src="@/assets/salat.svg" alt="salat icon">{{ arg.event.title }}
+        </div>
+      </template>
+    </FullCalendar>
+  </div>
 </template>
 
 <style>
