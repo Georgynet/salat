@@ -29,6 +29,7 @@ const confirm = useConfirm()
 
 const today = moment()
 const currentWeek = today.isoWeek()
+const disableNextWeek = today.isoWeekday() >= 5 && today.hour() > 12
 
 const addEvent = (calendarApi, id, startDate, endDate, status) => {
   calendarApi.addEvent({
@@ -77,6 +78,7 @@ const calendarOptions = {
   height: isFullWindow() ? 'auto' : 290,
   selectable: true,
   validRange: {
+    start: moment().startOf('week').toISOString(),
     end: moment().startOf('week').add(3, 'weeks').endOf('week').toISOString()
   },
   headerToolbar: {
@@ -135,8 +137,7 @@ const calendarOptions = {
       return ['disallow-week']
     }
 
-    const allowNextWeek = today.isoWeekday() < 5 && today.hour() > 12
-    if (!allowNextWeek && weekNumber === currentWeek + 1) {
+    if (disableNextWeek && weekNumber === currentWeek + 1) {
       return ['disallow-week']
     }
 
@@ -201,7 +202,7 @@ const calendarOptions = {
 
       appStore.setAppMessage(200, 'Kalenderdaten wurden gespeichert')
     } else {
-      appStore.setAppMessage(400, 'Kalenderdaten könten nicht gespeichert werden')
+      appStore.setAppMessage(400, 'Kalenderdaten konnten nicht gespeichert werden')
     }
   }
 }
