@@ -77,9 +77,9 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     if (to.name === undefined) {
         next({ name: 'notFound' })
-    } else if(to.name !== 'login' && !to.meta.requiresAuth && isAuthenticated()) {
+    } else if(to.name !== 'login' && !to.meta.requiresAuth && isAuthenticated.value) {
         next({ name: getUser().startRoute, replace: true })
-    } else if(to.name !== 'login' && to.meta.requiresAuth && !isAuthenticated()) {
+    } else if(to.name !== 'login' && to.meta.requiresAuth && !isAuthenticated.value) {
         next({ name: 'home', replace: true })
     } else {
         next()

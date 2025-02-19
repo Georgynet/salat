@@ -3,14 +3,14 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import fullcalendarDe from '@fullcalendar/core/locales/de'
-import {onMounted} from 'vue';
-
-import {inject} from 'vue'
+import {onMounted, inject} from 'vue'
 
 import {useConfirm} from 'primevue/useconfirm'
 import useCalendarService from '@/services/calendarService.js'
 import moment from 'moment'
 import useAppStore from '@/stores/appStore.js'
+
+import Message from 'primevue/message'
 
 import unicorn1 from '@/assets/unicorn.png';
 import unicorn3 from '@/assets/unicorn2.png';
@@ -29,7 +29,6 @@ const confirm = useConfirm()
 
 const today = moment()
 const currentWeek = today.isoWeek()
-
 
 const addEvent = (calendarApi, id, startDate, endDate, status) => {
   calendarApi.addEvent({

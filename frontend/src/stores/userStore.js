@@ -1,5 +1,5 @@
-import {ref} from 'vue'
-import moment from "moment";
+import {computed, ref} from 'vue'
+import moment from 'moment'
 
 const userDefaults = () => {
     return {
@@ -38,9 +38,9 @@ const useUserStore = () => {
         localStorage.setItem('token', token)
     }
 
-    const isAuthenticated = () => {
+    const isAuthenticated = computed(() => {
         return user.value.token !== null && user.value.isExpired === false
-    }
+    })
 
     return {
         isAuthenticated,
