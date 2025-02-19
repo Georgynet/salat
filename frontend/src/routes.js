@@ -1,5 +1,3 @@
-import {computed} from 'vue'
-
 import NotFoundView from '@/views/NotFoundView.vue'
 
 import HomeView from '@/views/HomeView.vue'
@@ -8,11 +6,9 @@ import DashboardView from '@/views/user/DashboardView.vue'
 import UsersView from '@/views/admin/UsersView.vue'
 import StatsView from '@/views/admin/StatsView.vue'
 
-import useUserService from '@/services/userService'
 import useUserStore from '@/stores/userStore'
 import {createRouter, createWebHashHistory} from 'vue-router'
 
-const userService = useUserService()
 const { getUser, isAuthenticated } = useUserStore()
 
 const routes = [
@@ -53,20 +49,6 @@ const routes = [
             label: 'Statistics',
             requiresAuth: true,
             roles: ['admin']
-        },
-    },
-    {
-        name: 'logout',
-        path: '/user/logout',
-        component: {
-            async beforeRouteEnter(to, from, next) {
-                await userService.logout()
-                next({ name: 'home' })
-            }
-        },
-        meta: {
-            requiresAuth: true,
-            roles: ['user', 'admin']
         },
     },
     {

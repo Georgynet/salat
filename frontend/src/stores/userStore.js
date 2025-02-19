@@ -39,7 +39,7 @@ const useUserStore = () => {
     }
 
     const isAuthenticated = () => {
-        return user.value.token !== null
+        return user.value.token !== null && user.value.isExpired === false
     }
 
     return {
