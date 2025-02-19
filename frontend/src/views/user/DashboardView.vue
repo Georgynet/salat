@@ -144,6 +144,10 @@ const calendarOptions = {
     return ['allow-week']
   },
 
+  viewDidMount: (info) => {
+    info.view.calendar.removeAllEvents()
+  },
+
   datesSet: async (info) => {
     const calenderApi = info.view.calendar
 
@@ -224,12 +228,6 @@ onMounted(() => {
 
 <template>
   <div class="relative">
-    <div class="mobile-rotate absolute z-50 inset-0 text-center">
-      <div class=" p-16 bg-white w-60 rounded-full inline-block">
-        <img src="@/assets/mobile-rotate-rotation-icon.svg" alt="">
-      </div>
-    </div>
-
     <FullCalendar ref="calendarContainer" :options="calendarOptions">
       <template #eventContent="arg">
         <div class="calendar-entry" v-tooltip.bottom="getTooltipMessage(arg.event.classNames)"><img
