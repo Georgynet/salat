@@ -14,7 +14,9 @@ onMounted(async () => {
   const loginSuccess = await userService.login()
   if (loginSuccess) {
     appStore.setAppMessage(200, 'Login success')
-    router.replace({name: getUser().startRoute})
+    window.setTimeout(() => {
+      router.replace({name: getUser().startRoute})
+    }, 1000)
   }
 })
 </script>

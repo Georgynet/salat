@@ -17,24 +17,11 @@
     cursor: pointer;
 }
 
-.mobile-rotate {
-    display: none;
-}
-
-@media (max-width: 400px) {
-    .mobile-rotate {
-        display: block;
-    }
-}
-
-
 html {
     &.dark-mode {
-        $background: #333;
-
         body,
         .p-menubar {
-            background: $background !important;
+            background: #333 !important;
             color: #f0f0f0;
         }
 
@@ -48,14 +35,6 @@ html {
 
         .p-menubar-item:not(.p-disabled) > .p-menubar-item-content:hover {
             background: #7272758f;
-        }
-
-        .mobile-rotate {
-            background-color: $background;
-
-            & img {
-                color: #FFF;
-            }
         }
     }
 
@@ -74,14 +53,6 @@ html {
 
         .total-people-button:hover {
             background-color: #059669 !important;
-        }
-
-        .mobile-rotate {
-            background-color: #FFF;
-
-            img {
-                color: #000;
-            }
         }
     }
 }

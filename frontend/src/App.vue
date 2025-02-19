@@ -1,13 +1,22 @@
 <script setup>
-import {onMounted, provide, ref} from 'vue'
+import {onMounted, provide, ref, watch} from 'vue'
+import Message from 'primevue/message'
 import Menubar from 'primevue/menubar'
-import AppMessage from '@/components/AppMessage.vue'
-import { getRoutes } from '@/routes.js'
 import Toast from 'primevue/toast'
 import ConfirmDialog from 'primevue/confirmdialog'
+
+import AppMessage from '@/components/AppMessage.vue'
+import {getRoutes} from '@/routes.js'
+
+import {useRouter, useRoute} from 'vue-router'
 import useAppStore from '@/stores/appStore.js'
+import useUserStore from '@/stores/userStore.js'
 
 const appStore = useAppStore()
+const userStore = useUserStore()
+
+const route = useRoute()
+const router = useRouter()
 
 provide('config', {
   VIEW_DATE_FORMAT: 'DD.MM.YYYY',
@@ -32,11 +41,22 @@ provide('config', {
 })
 
 const routes = ref({})
+const showTokenExpired = ref(false)
 
 onMounted(() => {
   routes.value = getRoutes()
   if (appStore.isDarkModeEnabled.value) {
     appStore.enableDarkMode()
+  }
+})
+
+watch(userStore.isAuthenticated, isAuthenticated => {
+  if (!isAuthenticated && route.meta.requiresAuth) {
+    showTokenExpired.value = true
+    window.setTimeout(() => {
+      showTokenExpired.value = false
+      router.replace({name: 'home'})
+    }, 2000)
   }
 })
 </script>
@@ -65,6 +85,11 @@ onMounted(() => {
     <ConfirmDialog />
     <AppMessage />
 
-    <RouterView />
+    <div v-if="!showTokenExpired">
+      <RouterView />
+    </div>
+    <div v-else class="text-center">
+      <Message severity="info">Dein Token ist abgelaufen.<br />Du wirst automatisch neu eingeloggt ...</Message>
+    </div>
   </div>
 </template>

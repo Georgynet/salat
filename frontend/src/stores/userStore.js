@@ -1,11 +1,13 @@
-import {ref} from 'vue'
+import {computed, ref} from 'vue'
+import moment from 'moment'
 
 const userDefaults = () => {
     return {
         username: null,
         role: 'guest',
         startRoute: 'user.dashboard',
-        token: null
+        token: null,
+        isExpired: true
     }
 }
 
@@ -16,7 +18,7 @@ const useUserStore = () => {
         return user.value
     }
 
-    const setUserToken = (token) => {
+    const setUserToken = async (token) => {
         if (token === null) {
             localStorage.removeItem('token')
             user.value = userDefaults()
@@ -29,15 +31,16 @@ const useUserStore = () => {
             username: tokenData.username,
             role: tokenData.role,
             startRoute: tokenData.role === 'admin' ? 'admin.users' : 'user.dashboard',
-            token
+            token,
+            isExpired: tokenData.exp - moment().unix() <= 0
         }
 
         localStorage.setItem('token', token)
     }
 
-    const isAuthenticated = () => {
-        return user.value.token !== null
-    }
+    const isAuthenticated = computed(() => {
+        return user.value.token !== null && user.value.isExpired === false
+    })
 
     return {
         isAuthenticated,
