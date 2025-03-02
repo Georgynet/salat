@@ -1,58 +1,94 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+html {
+  body {
+    background: #eef0f6;
+  }
 
-.fc .fc-button-primary:disabled {
+  .table-auto,
+  .fc-scrollgrid {
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .table-auto tr,
+  th {
+    background: #fff;
+  }
+
+  .fc-theme-standard .fc-scrollgrid,
+  .fc-theme-standard td, .fc-theme-standard th {
+    border: 1px solid #eef0f6;
+  }
+
+  .fc .fc-button-primary:disabled {
     background-color: #989898;
     opacity: 100%;
-}
+  }
 
-.fc .fc-button-primary {
+  .fc .fc-button-primary {
     background-color: #5d5e5f;
     border: none;
-}
+  }
 
-.fc .fc-button-primary:hover {
+  .fc .fc-button-primary:hover {
     background-color: #4f5152;
     cursor: pointer;
+  }
+
+  .fc .fc-toolbar-title {
+    margin-left: 150px;
+  }
 }
 
 html {
-    &.dark-mode {
-        body,
-        .p-menubar {
-            background: #333 !important;
-            color: #f0f0f0;
-        }
-
-        .bg-gray-300 {
-            background-color: #727275e0;
-        }
-
-        .p-tag-secondary {
-            background-color: #fdfdfd8a !important;
-        }
-
-        .p-menubar-item:not(.p-disabled) > .p-menubar-item-content:hover {
-            background: #7272758f;
-        }
+  &.dark-mode {
+    body,
+    .p-menubar {
+      background: #333 !important;
+      color: #f0f0f0;
     }
 
-    &:not(.dark-mode) {
-        .total-people-input {
-            background-color: #d1fae5 !important;
-        }
-
-        .statistics {
-            background-color: #ecfdf5 !important;
-        }
-
-        .total-people-button {
-            background-color: #10b981 !important;
-        }
-
-        .total-people-button:hover {
-            background-color: #059669 !important;
-        }
+    .bg-gray-300 {
+      background-color: #727275e0;
     }
+
+    th,
+    .table-auto tr,
+    .fc .fc-day-disabled {
+      background: transparent;
+    }
+
+    .fc-theme-standard .fc-scrollgrid,
+    .fc-theme-standard td, html .fc-theme-standard th {
+      border: 1px solid #7272758f;
+    }
+
+    .p-tag-secondary {
+      background-color: #fdfdfd8a !important;
+    }
+
+    .p-menubar-item:not(.p-disabled) > .p-menubar-item-content:hover {
+      background: #7272758f;
+    }
+  }
+
+  &:not(.dark-mode) {
+    .total-people-input {
+      background-color: #d1fae5 !important;
+    }
+
+    .statistics {
+      background-color: #ecfdf5 !important;
+    }
+
+    .total-people-button {
+      background-color: #10b981 !important;
+    }
+
+    .total-people-button:hover {
+      background-color: #059669 !important;
+    }
+  }
 }

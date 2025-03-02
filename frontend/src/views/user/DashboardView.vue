@@ -68,14 +68,14 @@ const updateCalendarSize = (calendar) => {
     calendar.setOption('height', 'auto')
   } else {
     calendar.changeView('dayGridWeek')
-    calendar.setOption('height', 290)
+    calendar.setOption('height', 390)
   }
 }
 
 const calendarOptions = {
   plugins: [dayGridPlugin, interactionPlugin],
   initialView: isFullWindow() ? 'dayGridMonth' : 'dayGridWeek',
-  height: isFullWindow() ? 'auto' : 290,
+  height: isFullWindow() ? 590 : 390,
   selectable: true,
   validRange: {
     start: moment().startOf('week').toISOString(),
@@ -228,7 +228,7 @@ onMounted(() => {
 
 <template>
   <div class="relative">
-    <FullCalendar ref="calendarContainer" :options="calendarOptions">
+    <FullCalendar ref="calendarContainer" class="zopa" :options="calendarOptions">
       <template #eventContent="arg">
         <div class="calendar-entry" v-tooltip.bottom="getTooltipMessage(arg.event.classNames)"><img
             style="margin-right: 7px"
@@ -255,6 +255,10 @@ onMounted(() => {
   cursor: pointer;
 }
 
+.fc .fc-day-disabled {
+  background: #ffff;
+}
+
 .fc .fc-daygrid-day.fc-day-today {
   background-color: #d2c288;
   position: relative;
@@ -278,11 +282,11 @@ onMounted(() => {
 }
 
 .disallow-week {
-  background-color: #f4e4a9;
+  background-color: #f6e0aa;
 }
 
 .allow-week {
-  background-color: #d1ffbf;
+  background-color: #b9dea7;
 }
 
 .event-approved {
@@ -294,6 +298,6 @@ onMounted(() => {
 }
 
 .event-reserved {
-  background-color: #dfc92b;
+  background-color: #eec318;
 }
 </style>
