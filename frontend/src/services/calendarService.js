@@ -31,10 +31,21 @@ const useCalendarService = () => {
         })
     }
 
+    const fetchAbsences = async (startDate, endDate) => {
+        try {
+            const response = await http.get('/api/user/calendar/get-close-intervals?start_date=' + startDate.format(appConfig.DATE_FORMAT) + '&end_date=' + endDate.format(appConfig.DATE_FORMAT))
+            return response.data.closeDateIntervals;
+        } catch (error) {
+            console.error('Can not become intervals', error);
+            return 0;
+        }
+    }
+
     return {
         getEvents,
         addEvent,
-        removeEvent
+        removeEvent,
+        fetchAbsences
     }
 }
 
