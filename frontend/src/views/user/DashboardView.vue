@@ -3,14 +3,12 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import fullcalendarDe from '@fullcalendar/core/locales/de'
-import {onMounted, inject} from 'vue'
+import {ref, onMounted, inject} from 'vue'
 
 import {useConfirm} from 'primevue/useconfirm'
 import useCalendarService from '@/services/calendarService.js'
 import moment from 'moment'
 import useAppStore from '@/stores/appStore.js'
-
-import Message from 'primevue/message'
 
 import unicorn1 from '@/assets/unicorn.png';
 import unicorn3 from '@/assets/unicorn2.png';
@@ -30,6 +28,7 @@ const confirm = useConfirm()
 const today = moment()
 const currentWeek = today.isoWeek()
 const disableNextWeek = today.isoWeekday() >= 5 && today.hour() > 12
+const absenceDates = ref([])
 
 const addEvent = (calendarApi, id, startDate, endDate, status) => {
   calendarApi.addEvent({
@@ -131,7 +130,12 @@ const calendarOptions = {
   },
 
   dayCellClassNames: function (info) {
-    const weekNumber = moment(info.date).isoWeek()
+    const weekNumber = moment(info.date).isoWeek(),
+        isAbsenceWeek = absenceDates.value.some(absence => {
+          const start = moment(absence.startDate),
+              end = moment(absence.endDate);
+          return moment(info.date).isBetween(start, end, 'day', '[]');
+        });
 
     if (weekNumber <= currentWeek) {
       return ['disallow-week']
@@ -139,6 +143,11 @@ const calendarOptions = {
 
     if (disableNextWeek && weekNumber === currentWeek + 1) {
       return ['disallow-week']
+    }
+
+    if (isAbsenceWeek) {
+      return ['absence-week'];
+
     }
 
     return ['allow-week']
@@ -166,9 +175,26 @@ const calendarOptions = {
     const calendarApi = selectInfo.view.calendar,
         weekNumber = moment(selectInfo.start).isoWeek(),
         currentWeek = moment().isoWeek(),
-        currentDayOfWeek = today.isoWeekday()
-
+        currentDayOfWeek = today.isoWeekday(),
+        absence = absenceDates.value.find(absence => {
+          const start = moment(absence.startDate),
+              end = moment(absence.endDate);
+          return moment(selectInfo.start).isBetween(start, end, 'day', '[]');
+        });
     calendarApi.unselect()
+
+    if (absence) {
+      const startDateFormatted = moment(absence.startDate).format('DD.MM.YYYY'),
+          endDateFormatted = moment(absence.endDate).format('DD.MM.YYYY');
+
+      confirm.require({
+        message: `Lars ist ab dem ${startDateFormatted} bis zum ${endDateFormatted} nicht da`,
+        header: 'Info',
+        acceptLabel: 'Ok',
+        rejectClass: '!hidden'
+      });
+      return;
+    }
 
     if (weekNumber < currentWeek || (weekNumber === currentWeek && currentDayOfWeek >= 5 && currentDayOfWeek <= 7)) {
       confirm.require({
@@ -207,7 +233,9 @@ const calendarOptions = {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  absenceDates.value = await calendarService.fetchAbsences(moment().startOf('year'), moment().endOf('year'));
+
   const styleElement = document.createElement('style');
   styleElement.textContent = `
     .fc .fc-daygrid-day.fc-day-today::before {
@@ -228,7 +256,7 @@ onMounted(() => {
 
 <template>
   <div class="relative">
-    <FullCalendar ref="calendarContainer" class="zopa" :options="calendarOptions">
+    <FullCalendar ref="calendarContainer" :options="calendarOptions">
       <template #eventContent="arg">
         <div class="calendar-entry" v-tooltip.bottom="getTooltipMessage(arg.event.classNames)"><img
             style="margin-right: 7px"
@@ -287,6 +315,10 @@ onMounted(() => {
 
 .allow-week {
   background-color: #b9dea7;
+}
+
+.absence-week {
+  background-color: #e3e3ec;
 }
 
 .event-approved {

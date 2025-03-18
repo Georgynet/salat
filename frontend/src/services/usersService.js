@@ -27,7 +27,7 @@ const useUsersService = () => {
     const fetchUserEntries = async (startDate, endDate) => {
         const response = await http.get('/api/user/calendar/all-user-list', {
             params: {
-                start_date:  startDate.format(appConfig.DATE_FORMAT),
+                start_date: startDate.format(appConfig.DATE_FORMAT),
                 end_date: endDate.format(appConfig.DATE_FORMAT)
             }
         })
@@ -66,13 +66,42 @@ const useUsersService = () => {
             return false;
         }
     }
+    const addAbsence = async (startDate, endDate) => {
+        try {
+            const response = await http.post('/api/admin/calendar/add-close-interval', {
+                startDate,
+                endDate
+            })
+            return response.status === 200;
+        } catch (error) {
+            console.error('Can not become interval', error)
+        }
+    }
+    const fetchAbsences = async (startDate, endDate) => {
+        try {
+            const response = await http.get('/api/user/calendar/get-close-intervals?start_date=' + startDate.format(appConfig.DATE_FORMAT) + '&end_date=' + endDate.format(appConfig.DATE_FORMAT))
+            return response.data.closeDateIntervals;
+        } catch (error) {
+            console.error('Can not become intervals', error);
+            return 0;
+        }
+    }
+
+    const removeAbsence = async (closeIntervalEntryId) => {
+        return await http.post('/api/admin/calendar/remove-close-interval', {
+            closeIntervalEntryId
+        })
+    }
 
     return {
         changeEntryStatus,
         fetchUsers,
         fetchUserEntries,
         fetchNumberOfPlates,
-        savePlatesNumber
+        savePlatesNumber,
+        addAbsence,
+        fetchAbsences,
+        removeAbsence
     }
 }
 

@@ -5,22 +5,16 @@ meta {
 }
 
 get {
-  url: http://localhost:8080/api/user/calendar/get-close-intervals?startDate=2025-03-01&endDate=2025-03-31
-  body: json
+  url: http://localhost:8080/api/user/calendar/get-close-intervals?start_date=2025-01-01&end_date=2025-12-31
+  body: none
   auth: none
 }
 
 params:query {
-  startDate: 2025-03-01
-  endDate: 2025-03-31
+  start_date: 2025-01-01
+  end_date: 2025-12-31
 }
 
 headers {
   Authorization: Bearer {{auth-token}}
-}
-
-body:json {
-  {
-    "statsDay": "2025-01-15T00:00:00Z"
-  }
 }

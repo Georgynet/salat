@@ -5,6 +5,7 @@ import HomeView from '@/views/HomeView.vue'
 import DashboardView from '@/views/user/DashboardView.vue'
 import UsersView from '@/views/admin/UsersView.vue'
 import StatsView from '@/views/admin/StatsView.vue'
+import AbsenceView from "@/views/admin/AbsenceView.vue"
 
 import useUserStore from '@/stores/userStore'
 import {createRouter, createWebHashHistory} from 'vue-router'
@@ -36,7 +37,7 @@ const routes = [
         path: '/admin/users',
         component: UsersView,
         meta: {
-            label: 'Users',
+            label: 'Benutzer',
             requiresAuth: true,
             roles: ['admin']
         },
@@ -46,7 +47,17 @@ const routes = [
         path: '/admin/statistics',
         component: StatsView,
         meta: {
-            label: 'Statistics',
+            label: 'Statistiken',
+            requiresAuth: true,
+            roles: ['admin']
+        },
+    },
+    {
+        name: 'admin.absence',
+        path: '/admin/absence',
+        component: AbsenceView,
+        meta: {
+            label: 'Abwesenheiten',
             requiresAuth: true,
             roles: ['admin']
         },
