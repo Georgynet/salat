@@ -29,6 +29,8 @@ const today = moment()
 const currentWeek = today.isoWeek()
 const disableNextWeek = today.isoWeekday() >= 5 && today.hour() > 12
 const absenceDates = ref([])
+const calendarContainer = ref(null)
+const isLoading = ref(true)
 
 const addEvent = (calendarApi, id, startDate, endDate, status) => {
   calendarApi.addEvent({
@@ -236,6 +238,12 @@ const calendarOptions = {
 onMounted(async () => {
   absenceDates.value = await calendarService.fetchAbsences(moment().startOf('year'), moment().endOf('year'));
 
+  if (calendarContainer.value) {
+    calendarContainer.value.getApi().refetchEvents();
+  }
+
+  isLoading.value = false;
+
   const styleElement = document.createElement('style');
   styleElement.textContent = `
     .fc .fc-daygrid-day.fc-day-today::before {
@@ -256,7 +264,8 @@ onMounted(async () => {
 
 <template>
   <div class="relative">
-    <FullCalendar ref="calendarContainer" :options="calendarOptions">
+    <p v-if="isLoading">Loading...</p>
+    <FullCalendar v-else ref="calendarContainer" :options="calendarOptions">
       <template #eventContent="arg">
         <div class="calendar-entry" v-tooltip.bottom="getTooltipMessage(arg.event.classNames)"><img
             style="margin-right: 7px"
