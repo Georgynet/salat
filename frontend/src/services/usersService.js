@@ -36,6 +36,10 @@ const useUsersService = () => {
         const entries = new Map()
         response.data.calendarEntries.forEach(entry => {
             entry.user = users.get(entry.userId)
+            if (entry.user === undefined) {
+                return
+            }
+
             delete entry.userId
             entries.set(moment(entry.date).format(appConfig.DATE_FORMAT) + '_' + entry.user.id, entry)
         })
