@@ -162,11 +162,6 @@ onMounted(async () => {
     const usersMap = await usersService.fetchUsers();
     users.value = Array.from(usersMap.entries()).map(([id, user]) => ({id, ...user}));
 
-    users.value.forEach((user) => {
-        const [firstName, lastName] = user.username.split('@')[0].split('.');
-        user.username = firstName.toUpperCase() + '. ' + lastName.charAt(0).toUpperCase() + lastName.slice(1);
-    })
-
     const weekdays = Array.from(moment.range(startDate.value, endDate.value).by('days')).filter(day => {
       return day.isoWeekday() >= 1 && day.isoWeekday() <= 5;
     });
@@ -222,7 +217,7 @@ onMounted(async () => {
     </thead>
     <tbody>
     <tr class="border-b" v-for="user in users" :key="user.id">
-      <td class="px-2 py-1 w-[200px] border-l">{{ user.username }}</td>
+      <td class="px-2 py-1 w-[200px] border-l">{{ usersService.getNameFromEmail(user) }}</td>
       <td
           class="px-2 py-1 w-[200px] border-l border-r text-center"
           v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')"
