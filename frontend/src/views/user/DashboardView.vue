@@ -10,6 +10,8 @@ import useCalendarService from '@/services/calendarService.js'
 import moment from 'moment'
 import useAppStore from '@/stores/appStore.js'
 
+import Legend from '@/components/Legend.vue'
+
 import unicorn1 from '@/assets/unicorn.png';
 import unicorn3 from '@/assets/unicorn2.png';
 import unicorn2 from '@/assets/unicorn1.png';
@@ -273,6 +275,8 @@ onMounted(async () => {
         </div>
       </template>
     </FullCalendar>
+
+    <Legend />
   </div>
 </template>
 
