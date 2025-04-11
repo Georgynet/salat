@@ -27,7 +27,7 @@ const confirm = useConfirm()
 
 const today = moment()
 const currentWeek = today.isoWeek()
-const disableNextWeek = today.isoWeekday() >= 5 && today.hour() > 12
+const disableNextWeek = today.isoWeekday() >= 5 && today.hour() >= 12
 const absenceDates = ref([])
 const calendarContainer = ref(null)
 const isLoading = ref(true)
