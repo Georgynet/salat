@@ -6,6 +6,7 @@ import DashboardView from '@/views/user/DashboardView.vue'
 import UsersView from '@/views/admin/UsersView.vue'
 import StatsView from '@/views/admin/StatsView.vue'
 import AbsenceView from "@/views/admin/AbsenceView.vue"
+import ChecklistView from "@/views/admin/ChecklistView.vue"
 
 import useUserStore from '@/stores/userStore'
 import {createRouter, createWebHashHistory} from 'vue-router'
@@ -58,6 +59,16 @@ const routes = [
         component: AbsenceView,
         meta: {
             label: 'Abwesenheiten',
+            requiresAuth: true,
+            roles: ['admin']
+        },
+    },
+    {
+        name: 'admin.checklist',
+        path: '/admin/checklist',
+        component: ChecklistView,
+        meta: {
+            label: 'Checkliste',
             requiresAuth: true,
             roles: ['admin']
         },

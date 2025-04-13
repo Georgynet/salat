@@ -83,7 +83,13 @@ const useUsersService = () => {
     }
     const fetchAbsences = async (startDate, endDate) => {
         try {
-            const response = await http.get('/api/user/calendar/get-close-intervals?start_date=' + startDate.format(appConfig.DATE_FORMAT) + '&end_date=' + endDate.format(appConfig.DATE_FORMAT))
+            const response = await http.get('/api/user/calendar/get-close-intervals', {
+                params: {
+                    start_date: startDate.format(appConfig.DATE_FORMAT),
+                    end_date: endDate.format(appConfig.DATE_FORMAT)
+                }
+            })
+
             return response.data.closeDateIntervals;
         } catch (error) {
             console.error('Can not become intervals', error);
@@ -124,6 +130,11 @@ const useUsersService = () => {
         }
     }
 
+    const getNameFromEmail = (user) => {
+        const [firstName, lastName] = user.username.split('@')[0].split('.');
+        return firstName.toUpperCase() + ((lastName) ? '. ' + lastName.charAt(0).toUpperCase() + lastName.slice(1) : '');
+    }
+
     return {
         changeEntryStatus,
         fetchUsers,
@@ -134,7 +145,8 @@ const useUsersService = () => {
         fetchAbsences,
         removeAbsence,
         setCheckboxValue,
-        getCheckboxValue
+        getCheckboxValue,
+        getNameFromEmail
     }
 }
 

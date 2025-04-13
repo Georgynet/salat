@@ -12,6 +12,9 @@ import useAppStore from '@/stores/appStore.js'
 
 import Legend from '@/components/Legend.vue'
 
+import TrashIcon from '@/components/icon/Trash.vue'
+import salatIcon from '@/assets/salat.svg';
+
 import unicorn1 from '@/assets/unicorn.png';
 import unicorn3 from '@/assets/unicorn2.png';
 import unicorn2 from '@/assets/unicorn1.png';
@@ -75,6 +78,17 @@ const updateCalendarSize = (calendar) => {
   }
 }
 
+const canDeleteEvent = (event) => {
+  const weekNumber = moment(event.start).isoWeek()
+
+  return !(
+      weekNumber <= currentWeek ||
+      event.classNames.includes('event-rejected') ||
+      (event.classNames.includes('event-approved') && weekNumber === currentWeek) ||
+      (event.classNames.includes('event-approved') && disableNextWeek && weekNumber === currentWeek + 1)
+  )
+}
+
 const calendarOptions = {
   plugins: [dayGridPlugin, interactionPlugin],
   initialView: isFullWindow() ? 'dayGridMonth' : 'dayGridWeek',
@@ -91,14 +105,11 @@ const calendarOptions = {
   },
   initialDate: moment().toISOString(),
   eventClick: (info) => {
-    const eventId = info.event.id,
-        weekNumber = moment(info.event.start).isoWeek(),
-        currentWeek = moment().isoWeek();
-
-    if (weekNumber === currentWeek) {
-      appStore.setAppMessage(400, 'Die Einträge dieser Woche können nicht gelöscht werden');
-      return;
+    if (!canDeleteEvent(info.event)) {
+      return
     }
+
+    const eventId = info.event.id
 
     confirm.require({
       message: 'Bist du dir sicher, dass du diesen Eintrag löschen möchtest?',
@@ -178,7 +189,6 @@ const calendarOptions = {
   select: async (selectInfo) => {
     const calendarApi = selectInfo.view.calendar,
         weekNumber = moment(selectInfo.start).isoWeek(),
-        currentWeek = moment().isoWeek(),
         currentDayOfWeek = today.isoWeekday(),
         absence = absenceDates.value.find(absence => {
           const start = moment(absence.startDate),
@@ -246,7 +256,7 @@ onMounted(async () => {
 
   isLoading.value = false;
 
-  const styleElement = document.createElement('style');
+  const styleElement = document.createElement('style')
   styleElement.textContent = `
     .fc .fc-daygrid-day.fc-day-today::before {
       content: '';
@@ -269,9 +279,10 @@ onMounted(async () => {
     <p v-if="isLoading">Loading...</p>
     <FullCalendar v-else ref="calendarContainer" :options="calendarOptions">
       <template #eventContent="arg">
-        <div class="calendar-entry" v-tooltip.bottom="getTooltipMessage(arg.event.classNames)"><img
-            style="margin-right: 7px"
-            src="@/assets/salat.svg" alt="salat icon">{{ arg.event.title }}
+        <div class="calendar-entry text-white" v-tooltip.bottom="getTooltipMessage(arg.event.classNames)">
+          <img class="salat" :src="salatIcon" alt="salat icon">
+          {{ arg.event.title }}
+          <TrashIcon v-if="canDeleteEvent(arg.event)" />
         </div>
       </template>
     </FullCalendar>
@@ -315,11 +326,19 @@ onMounted(async () => {
 
 .calendar-entry {
   display: flex;
-  justify-content: space-around;
   align-items: baseline;
   padding: 5px 5px 5px 15px;
   font-size: 18px;
   color: #fff;
+  width: 100%;
+}
+
+.calendar-entry .salat {
+  margin-right: 7px
+}
+
+.calendar-entry .icon-trash {
+  margin-left: auto;
 }
 
 .disallow-week {
