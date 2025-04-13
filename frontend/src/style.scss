@@ -40,6 +40,14 @@ html {
   .fc .fc-toolbar-title {
     margin-left: 150px;
   }
+
+  .section {
+    border-radius: 6px;
+
+    & > div {
+      border-radius: 6px 0 0 6px;
+    }
+  }
 }
 
 html {
@@ -71,6 +79,14 @@ html {
 
     .p-menubar-item:not(.p-disabled) > .p-menubar-item-content:hover {
       background: #7272758f;
+    }
+
+    .section {
+      background: #7272758f;
+
+      h2, p {
+        color: #FFF;
+      }
     }
   }
 

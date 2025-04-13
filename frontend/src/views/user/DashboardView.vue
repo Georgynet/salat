@@ -10,6 +10,8 @@ import useCalendarService from '@/services/calendarService.js'
 import moment from 'moment'
 import useAppStore from '@/stores/appStore.js'
 
+import Legend from '@/components/Legend.vue'
+
 import TrashIcon from '@/components/icon/Trash.vue'
 import salatIcon from '@/assets/salat.svg';
 
@@ -284,6 +286,8 @@ onMounted(async () => {
         </div>
       </template>
     </FullCalendar>
+
+    <Legend />
   </div>
 </template>
 
