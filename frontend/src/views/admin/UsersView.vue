@@ -1,12 +1,13 @@
 <script setup>
 import moment from 'moment'
-import {inject, onMounted, ref} from 'vue'
+import {inject, onMounted, ref, computed} from 'vue'
 import useUsersService from '@/services/usersService.js'
 import {useToast} from 'primevue/usetoast'
 
 import DatePicker from 'primevue/datepicker'
 import Checkbox from 'primevue/checkbox'
 import DaySelect from '@/components/DaySelect.vue'
+import InputText from 'primevue/inputtext'
 
 const usersService = useUsersService()
 const toast = useToast()
@@ -25,6 +26,16 @@ const platesNumbers = ref({});
 const startDate = ref(moment().startOf('week'))
 const endDate = ref(moment().endOf('week'))
 const dateRange = ref(moment.range(startDate.value, endDate.value))
+
+const searchQuery = ref('');
+const filteredUsers = computed(() => {
+  if (!searchQuery.value) {
+    return users.value;
+  }
+  return users.value.filter(user =>
+      usersService.getNameFromEmail(user).toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
 
 const loadTable = async () => {
   loading.value = true
@@ -200,6 +211,11 @@ onMounted(async () => {
     </div>
   </div>
 
+  <div class="flex justify-center my-4">
+    <InputText v-model="searchQuery" placeholder="Nutzer suchen..." class="w-1/3" />
+  </div>
+
+
   <table class="mx-auto table-auto mb-4" v-if="!loading" v-for="week in dateRange.by('weeks')">
     <thead>
     <tr>
@@ -216,7 +232,7 @@ onMounted(async () => {
     </tr>
     </thead>
     <tbody>
-    <tr class="border-b" v-for="user in users" :key="user.id">
+    <tr class="border-b" v-for="user in filteredUsers" :key="user.id">
       <td class="px-2 py-1 w-[200px] border-l">{{ usersService.getNameFromEmail(user) }}</td>
       <td
           class="px-2 py-1 w-[200px] border-l border-r text-center"
