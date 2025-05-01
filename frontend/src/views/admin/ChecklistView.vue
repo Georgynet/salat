@@ -1,9 +1,10 @@
 <script setup>
-import {inject, onMounted, ref} from 'vue'
+import {inject, onMounted, ref, computed} from 'vue'
 import moment from 'moment'
 import useUsersService from '@/services/usersService.js'
 import Checkbox from 'primevue/checkbox'
 import {useToast} from 'primevue/usetoast'
+import InputText from 'primevue/inputtext'
 
 const toast = useToast()
 const usersService = useUsersService()
@@ -15,6 +16,17 @@ const loading = ref(true)
 const users = ref([])
 const entries = ref([])
 const checkedUsers = ref([])
+
+
+const searchQuery = ref('');
+const filteredUsers = computed(() => {
+  if (!searchQuery.value) {
+    return users.value;
+  }
+  return users.value.filter(user =>
+      usersService.getNameFromEmail(user).toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
 
 const checkUser = async (userId) => {
   const visitDate = today.startOf('day').format(appConfig.DATETIME_FORMAT)
@@ -59,6 +71,9 @@ onMounted(async () => {
 </script>
 
 <template>
+  <div class="flex justify-center my-4">
+    <InputText v-model="searchQuery" placeholder="Nutzer suchen..." class="w-1/3" />
+  </div>
   <div>
     <table class="mx-auto table-auto mb-4" v-if="!loading">
       <thead>
@@ -67,7 +82,7 @@ onMounted(async () => {
       </tr>
       </thead>
       <tbody>
-      <tr v-for="user in users">
+      <tr v-for="user in filteredUsers">
         <td class="px-2 py-1 w-[200px] border">{{ usersService.getNameFromEmail(user) }}</td>
         <td class="px-2 py-1 w-[150px] border text-center">{{ appConfig.calendar.statusText[entries.get(today.format(appConfig.DATE_FORMAT) + '_' + user.id)?.status] ?? '---' }}</td>
         <td class="px-2 py-1 w-[100px] border text-center">
