@@ -221,7 +221,7 @@ const calendarOptions = {
     }
 
     const startDate = moment(selectInfo.startStr),
-        endDate = moment(selectInfo.endStr)
+        endDate = moment(selectInfo.endStr).subtract(1, 'days')
 
     if (calendarApi.getEventById(startDate.format(appConfig.DATE_FORMAT)) instanceof Object) {
       confirm.require({
@@ -237,7 +237,7 @@ const calendarOptions = {
 
     if (response.status === 200) {
       response.data.calendarEntries.forEach(entry => {
-        addEvent(calendarApi, entry.id, moment(entry.date), moment(entry.date).add(1, 'd'), entry.status)
+        addEvent(calendarApi, entry.id, moment(entry.date), moment(entry.date), entry.status)
       })
 
       appStore.setAppMessage(200, 'Kalenderdaten wurden gespeichert')
