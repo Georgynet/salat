@@ -80,7 +80,7 @@ const dayEntry = (day, userId) => {
 const changeUserDayStatus = async (data) => {
   const changed = await usersService.changeEntryStatus(data.id, data.status)
   if (changed) {
-    await loadTable()
+    dayEntry(data.date, data.userId).status = data.status
     toast.add({severity: 'success', summary: 'Status geändert...', life: 2000})
   }
 }
@@ -246,7 +246,7 @@ onMounted(async () => {
           v-for="day in moment.range(week.clone().startOf('week'), week.clone().endOf('week').subtract(2, 'day')).by('day')"
       >
         <div class="flex-wrapper">
-          <day-select v-bind="dayEntry(day, user.id)" @change="changeUserDayStatus"/>
+          <day-select v-bind="{userId: user.id, ...dayEntry(day, user.id)}" @change="changeUserDayStatus"/>
           <checkbox v-model="checkedUsers[`${user.id}_${day.format(appConfig.DATE_FORMAT)}`]"
                     @click="saveCheckboxValue(day, user.id)" binary/>
         </div>
