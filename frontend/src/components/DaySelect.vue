@@ -2,6 +2,7 @@
 import {ref, inject} from 'vue'
 import Select from 'primevue/select'
 import Tag from 'primevue/tag'
+import moment from 'moment'
 
 const appConfig = inject('config')
 
@@ -13,6 +14,9 @@ const props = defineProps({
   },
   date: {
     type: String
+  },
+  userId: {
+    type: Number
   },
   status: {
     type: String,
@@ -27,6 +31,8 @@ const changeDayStatus = () => {
   editMode.value = false
   emit('change', {
     id: props.id,
+    userId: props.userId,
+    date: moment(props.date),
     status: status.value
   })
 }
