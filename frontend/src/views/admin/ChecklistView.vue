@@ -86,7 +86,10 @@ onMounted(async () => {
       </tr>
       </thead>
       <tbody>
-      <tr v-for="user in filteredUsers">
+      <tr v-if="filteredUsers.length === 0">
+        <td colspan="3" class="px-24 py-4">Keine Einträge für heute</td>
+      </tr>
+      <tr v-else v-for="user in filteredUsers">
         <td class="px-2 py-1 w-[200px] border">
           {{ usersService.getNameFromEmail(user) }}
           <CardSelector
