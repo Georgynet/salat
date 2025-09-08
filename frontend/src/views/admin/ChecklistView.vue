@@ -12,19 +12,22 @@ const usersService = useUsersService()
 const today = moment()
 
 const appConfig = inject('config')
+const todayFormatted = today.format(appConfig.DATE_FORMAT)
 
 const loading = ref(true)
 const users = ref([])
 const entries = ref([])
 const checkedUsers = ref([])
 
-
 const searchQuery = ref('');
 const filteredUsers = computed(() => {
+  const userList = users.value.filter(user => entries.value.get(todayFormatted + '_' + user.id))
+
   if (!searchQuery.value) {
-    return users.value;
+    return userList;
   }
-  return users.value.filter(user =>
+
+  return userList.filter(user =>
       usersService.getNameFromEmail(user).toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
@@ -92,7 +95,7 @@ onMounted(async () => {
               @card-updated="(color) => user.penaltyCard = color"
           />
         </td>
-        <td class="px-2 py-1 w-[150px] border text-center">{{ appConfig.calendar.statusText[entries.get(today.format(appConfig.DATE_FORMAT) + '_' + user.id)?.status] ?? '---' }}</td>
+        <td class="px-2 py-1 w-[150px] border text-center">{{ appConfig.calendar.statusText[entries.get(todayFormatted + '_' + user.id)?.status] ?? '---' }}</td>
         <td class="px-2 py-1 w-[100px] border text-center">
           <Checkbox v-model="checkedUsers" :value="user.id" @click="checkUser(user.id)" size="large" />
         </td>
