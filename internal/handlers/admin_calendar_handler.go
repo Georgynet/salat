@@ -10,7 +10,7 @@ import (
 	"github.com/DevPulseLab/salat/internal/enum"
 	"github.com/DevPulseLab/salat/internal/forms"
 	"github.com/DevPulseLab/salat/internal/helper"
-	"github.com/DevPulseLab/salat/internal/service"
+	"github.com/DevPulseLab/salat/internal/services"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -23,19 +23,18 @@ type AdminCalendarHandler struct {
 	RequestHelper        *helper.RequestHelper
 	CalendarDtoBuilder   *builder.CalendarDtoBuilder
 	VisitStatsDtoBuilder *builder.VisitStatsDtoBuilder
-	MessagingService     *service.MessagingService
+	MessagingService     *services.MessagingService
 	Logger               *logrus.Logger
 }
 
 func NewAdminCalendarHandler(db *gorm.DB, config *config.Config, log *logrus.Logger) *AdminCalendarHandler {
-	dateHelper := helper.NewDateHelper()
 	closeIntervalRepo := repositories.NewCloseIntervalsRepository(db)
-	calendarRepo := repositories.NewCalendarRepository(db, dateHelper)
+	calendarRepo := repositories.NewCalendarRepository(db)
 	visitStatsRepo := repositories.NewVisitStatsRepository(db)
 	requestHelper := helper.NewRequestHelper()
 	calendarDtoBuilder := builder.NewCalendarDtoBuilder()
 	visitStatsDtoBuilder := builder.NewVisitStatsDtoBuilder()
-	ms := service.NewMessagingService(config.Slack.Token, db)
+	ms := services.NewMessagingService(config.Slack.Token, db)
 	return &AdminCalendarHandler{
 		calendarRepo,
 		closeIntervalRepo,
@@ -60,7 +59,12 @@ func (handler *AdminCalendarHandler) AllUserList(ctx *gin.Context) {
 		return
 	}
 
-	calendars := handler.CalendarRepo.GetCalendarEntriesForAllUsers(startDate, endDate)
+	calendars, err := handler.CalendarRepo.FindByDateRange(startDate, endDate)
+	if err != nil {
+		handler.Logger.Errorf("Errror while find data by date range: %s", err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "An error occurred data by range"})
+		return
+	}
 
 	calendarDtos := handler.CalendarDtoBuilder.BuildFromCalendarModels(calendars)
 
@@ -74,7 +78,7 @@ func (handler *AdminCalendarHandler) ChangeEntryStatus(ctx *gin.Context) {
 		return
 	}
 
-	calendarModel, err := handler.CalendarRepo.ChangeEntryStatus(form.CalendarEntryId, form.NewStatus)
+	calendarModel, err := handler.CalendarRepo.UpdateStatus(form.CalendarEntryId, form.NewStatus)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Calendar entry not changed"})
 		return
